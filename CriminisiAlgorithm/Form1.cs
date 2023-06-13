@@ -17,21 +17,32 @@ namespace CriminisiAlgorithm
             InitializeComponent();
         }
 
+        public Image image;
+
+        // load image in picture box and store the image
+        public void LoadImageFromFile(PictureBox pictureBox)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Image Files|*.png";
+            openFileDialog.Title = "Select an Image File";
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string selectedFile = openFileDialog.FileName;
+                image = Image.FromFile(selectedFile);
+
+                pictureBox.Image = image;
+            }
+        }
+
         private void Form1_Load(object sender, EventArgs e)
         {
 
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
+        private void LoadImage_Click(object sender, EventArgs e)
         {
-
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            Console.WriteLine("=====");
-            Size size = new Size(3,5);
-            Console.WriteLine(string.Format("X: {0}, Y: {1}", size.Width, size.Height));
+            LoadImageFromFile(pictureBox1);
         }
     }
 }
