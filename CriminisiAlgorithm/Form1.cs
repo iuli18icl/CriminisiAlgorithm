@@ -31,7 +31,7 @@ namespace CriminisiAlgorithm
         {
             Console.WriteLine("=====");
             Size size = new Size(3,5);
-            Console.WriteLine(string.Format("X: {0}, Y: {1}", size.width, size.height));
+            Console.WriteLine(string.Format("X: {0}, Y: {1}", size.Width, size.Height));
         }
     }
 }

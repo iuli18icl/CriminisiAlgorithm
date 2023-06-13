@@ -8,12 +8,12 @@ namespace CriminisiAlgorithm
 {
     internal class Size
     {
-        public int width { get; set; }
-        public int height { get; set; }
-        public Size(int width, int height) 
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public Size(int Width, int Height) 
         {
-            this.width = width;
-            this.height = height;
+            this.Width = Width;
+            this.Height = Height;
         }
     }
 }
