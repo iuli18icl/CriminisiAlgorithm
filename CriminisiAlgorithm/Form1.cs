@@ -96,33 +96,44 @@ namespace CriminisiAlgorithm
                         {
                             if (!Utils.CheckOverlap(Utils.BlockToRectangle(rosBlock), Utils.BlockToRectangle(imageBlock)))
                             {
-                                byte[,] blockR = new byte[blockSize, blockSize];
-                                byte[,] blockG = new byte[blockSize, blockSize];
-                                byte[,] blockB = new byte[blockSize, blockSize];
+                                byte[,] diffRedPixels = new byte[blockSize, blockSize];
+                                byte[,] diffGreenPixels = new byte[blockSize, blockSize];
+                                byte[,] diffBluePixels = new byte[blockSize, blockSize];
 
                                 for (int i = 0; i < blockSize; i++)
                                 {
                                     for (int j = 0; j < blockSize; j++)
                                     {
-                                        byte pixelR = (byte)Math.Abs(rosBlock.RedPixels[i, j] - imageBlock.RedPixels[i, j]);
-                                        byte pixelG = (byte)Math.Abs(rosBlock.GreenPixels[i, j] - imageBlock.GreenPixels[i, j]);
-                                        byte pixelB = (byte)Math.Abs(rosBlock.BluePixels[i, j] - imageBlock.BluePixels[i, j]);
+                                        diffRedPixels[i, j] = (byte)Math.Abs(rosBlock.RedPixels[i, j] - imageBlock.RedPixels[i, j]);
+                                        diffGreenPixels[i, j] = (byte)Math.Abs(rosBlock.GreenPixels[i, j] - imageBlock.GreenPixels[i, j]);
+                                        diffBluePixels[i, j] = (byte)Math.Abs(rosBlock.BluePixels[i, j] - imageBlock.BluePixels[i, j]);
 
-                                        blockR[i, j] = pixelR;
-                                        blockG[i, j] = pixelG;
-                                        blockB[i, j] = pixelG;
+                                        if (diffRedPixels[i, j] <= lambda)
+                                            diffRedPixels[i, j] = 1;
+                                        else diffRedPixels[i, j] = 0;
 
-                                        BlockRGB differenceBlock = new BlockRGB(new Point(i, j), new Size(blockSize, blockSize), blockR, blockG, blockB);
+                                        if (diffGreenPixels[i, j] <= lambda)
+                                            diffGreenPixels[i, j] = 1;
+                                        else diffGreenPixels[i, j] = 0;
+
+                                        if (diffBluePixels[i, j] <= lambda)
+                                            diffBluePixels[i, j] = 1;
+                                        else diffBluePixels[i, j] = 0;
+
+                                        BlockRGB differenceBlock = new BlockRGB(new Point(i, j), new Size(blockSize, blockSize), diffRedPixels, diffGreenPixels, diffBluePixels);
                                         diffValues.Add(differenceBlock);
                                     }
                                 }
+
+                                //if we use the method ComputeDifference from BlockRGB class
+                                //BlockRGB differenceBlock = ComputeDifference(rosBlock, imageBlock);
+                                //diffValues.Add(differenceBlock);
                             }
                         }
                     }
 
                     //  Verificare
-                    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    // Print the first block from rosBlocks
+                    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     // Print the first block from rosBlocks
                     BlockRGB firstRosBlock = (BlockRGB)rosBlocks.FirstOrDefault();
                     if (firstRosBlock != null)
@@ -189,6 +200,18 @@ namespace CriminisiAlgorithm
                                 diffRedPixels[i, j] = (byte)Math.Abs(block1.RedPixels[i, j] - block2.RedPixels[i, j]);
                                 diffGreenPixels[i, j] = (byte)Math.Abs(block1.GreenPixels[i, j] - block2.GreenPixels[i, j]);
                                 diffBluePixels[i, j] = (byte)Math.Abs(block1.BluePixels[i, j] - block2.BluePixels[i, j]);
+
+                                if (diffRedPixels[i, j] <= lambda)
+                                    diffRedPixels[i, j] = 1;
+                                else diffRedPixels[i, j] = 0;
+
+                                if (diffGreenPixels[i, j] <= lambda)
+                                    diffGreenPixels[i, j] = 1;
+                                else diffGreenPixels[i, j] = 0;
+
+                                if (diffBluePixels[i, j] <= lambda)
+                                    diffBluePixels[i, j] = 1;
+                                else diffBluePixels[i, j] = 0;
                             }
                         }
 
@@ -210,9 +233,7 @@ namespace CriminisiAlgorithm
                         }
                     }
 
-
-                    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+                    /////////////////////////////////////////////////////////////////
                 }
             }
         }
