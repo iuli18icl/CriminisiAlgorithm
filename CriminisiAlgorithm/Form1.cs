@@ -88,30 +88,41 @@ namespace CriminisiAlgorithm
                     criminisi.DivideImageIntoBlocks(pictureBox1.Image, blockSize, stepSize);
                     List<IBlock> imageBlocks = criminisi.Blocks;
 
+                    List<IBlock> diffValues = new List<IBlock>();
+
                     foreach (BlockRGB rosBlock in rosBlocks)
                     {
                         foreach (BlockRGB imageBlock in imageBlocks)
                         {
                             if (!Utils.CheckOverlap(Utils.BlockToRectangle(rosBlock), Utils.BlockToRectangle(imageBlock)))
                             {
-                                Console.WriteLine("not overlapping");
+                                byte[,] blockR = new byte[blockSize, blockSize];
+                                byte[,] blockG = new byte[blockSize, blockSize];
+                                byte[,] blockB = new byte[blockSize, blockSize];
+
                                 for (int i = 0; i < blockSize; i++)
                                 {
                                     for (int j = 0; j < blockSize; j++)
                                     {
-                                        int diffR = Math.Abs(rosBlock.RedPixels[i, j] - imageBlock.RedPixels[i, j]);
-                                        int diffG = Math.Abs(rosBlock.GreenPixels[i, j] - imageBlock.GreenPixels[i, j]);
-                                        int diffB = Math.Abs(rosBlock.BluePixels[i, j] - imageBlock.BluePixels[i, j]);                  
+                                        byte pixelR = (byte)Math.Abs(rosBlock.RedPixels[i, j] - imageBlock.RedPixels[i, j]);
+                                        byte pixelG = (byte)Math.Abs(rosBlock.GreenPixels[i, j] - imageBlock.GreenPixels[i, j]);
+                                        byte pixelB = (byte)Math.Abs(rosBlock.BluePixels[i, j] - imageBlock.BluePixels[i, j]);
+
+                                        blockR[i, j] = pixelR;
+                                        blockG[i, j] = pixelG;
+                                        blockB[i, j] = pixelG;
+
+                                        BlockRGB differenceBlock = new BlockRGB(new Point(i, j), new Size(blockSize, blockSize), blockR, blockG, blockB);
+                                        diffValues.Add(differenceBlock);
                                     }
                                 }
                             }
-                            else Console.WriteLine("overlapping");
-
                         }
                     }
 
                     //  Verificare
-                    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                    // Print the first block from rosBlocks
                     // Print the first block from rosBlocks
                     BlockRGB firstRosBlock = (BlockRGB)rosBlocks.FirstOrDefault();
                     if (firstRosBlock != null)
@@ -144,30 +155,44 @@ namespace CriminisiAlgorithm
                         PrintMatrix(lastImageBlock.BluePixels);
                     }
 
-                    // Print the first difference calculated
-                    BlockRGB firstImageBlock = (BlockRGB)imageBlocks.FirstOrDefault();
-                    if (firstImageBlock != null)
+                    // Compute the difference between the first block from rosBlocks and the last block from imageBlocks
+                    BlockRGB diffBlock = ComputeDifference(firstRosBlock, lastImageBlock);
+
+                    if (diffBlock != null)
                     {
-                        if (!Utils.CheckOverlap(Utils.BlockToRectangle(firstRosBlock), Utils.BlockToRectangle(lastImageBlock)))
+                        Console.WriteLine("Difference Block:");
+                        Console.WriteLine($"Coordinates: {diffBlock.TopLeft}");
+                        Console.WriteLine($"Size: {diffBlock.Size}");
+                        Console.WriteLine("Color Components:");
+                        Console.WriteLine("Red:");
+                        PrintMatrix(diffBlock.RedPixels);
+                        Console.WriteLine("Green:");
+                        PrintMatrix(diffBlock.GreenPixels);
+                        Console.WriteLine("Blue:");
+                        PrintMatrix(diffBlock.BluePixels);
+                    }
+
+                    // Helper method to compute the difference between two blocks
+                    BlockRGB ComputeDifference(BlockRGB block1, BlockRGB block2)
+                    {
+                        if (block1 == null || block2 == null)
+                            return null;
+
+                        byte[,] diffRedPixels = new byte[blockSize, blockSize];
+                        byte[,] diffGreenPixels = new byte[blockSize, blockSize];
+                        byte[,] diffBluePixels = new byte[blockSize, blockSize];
+
+                        for (int i = 0; i < blockSize; i++)
                         {
-                            Console.WriteLine("not overlapping");
-
-                            //Console.WriteLine("First Difference:");
-                            //for (int i = 0; i < blockSize; i++)
-                            //{
-                            //    for (int j = 0; j < blockSize; j++)
-                            //    {
-                            //        int diffR = Math.Abs(firstRosBlock.RedPixels[i, j] - firstImageBlock.RedPixels[i, j]);
-                            //        int diffG = Math.Abs(firstRosBlock.GreenPixels[i, j] - firstImageBlock.GreenPixels[i, j]);
-                            //        int diffB = Math.Abs(firstRosBlock.BluePixels[i, j] - firstImageBlock.BluePixels[i, j]);
-
-                            //        Console.WriteLine($"Diff R: {diffR}, Diff G: {diffG}, Diff B: {diffB}");
-                            //    }
-                            //}
+                            for (int j = 0; j < blockSize; j++)
+                            {
+                                diffRedPixels[i, j] = (byte)Math.Abs(block1.RedPixels[i, j] - block2.RedPixels[i, j]);
+                                diffGreenPixels[i, j] = (byte)Math.Abs(block1.GreenPixels[i, j] - block2.GreenPixels[i, j]);
+                                diffBluePixels[i, j] = (byte)Math.Abs(block1.BluePixels[i, j] - block2.BluePixels[i, j]);
+                            }
                         }
-                        else 
-                            Console.WriteLine("overlapping");
 
+                        return new BlockRGB(block1.TopLeft, block1.Size, diffRedPixels, diffGreenPixels, diffBluePixels);
                     }
 
                     // Helper method to print a matrix
@@ -185,6 +210,8 @@ namespace CriminisiAlgorithm
                         }
                     }
 
+
+                    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
                 }
             }
