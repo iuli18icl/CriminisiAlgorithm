@@ -10,6 +10,12 @@ namespace CriminisiAlgorithm
     {
         public Point TopLeft { get; set; }
         public Size Size { get; set; }
+
+        public int X => TopLeft.X;
+        public int Y => TopLeft.Y;
+        public int Width => Size.Width;
+        public int Height => Size.Height;
+
         public byte[,] RedPixels { get; set; }
         public byte[,] GreenPixels { get; set; }
         public byte[,] BluePixels { get; set; }

@@ -15,6 +15,7 @@ namespace CriminisiAlgorithm
         public Point TopLeft { get; set; }
         public Size Size { get; set; }
 
+        // Fiecare bloc este format din matrici separate pentru fiecare nivel de culoare RGB
         public void LoadBlocks(Image image, int blockSize, Point TopLeft, Size Size, int stepSize)
         {
             byte[,,] imageStructure = Utils.ConvertImageToByteArray(image);
@@ -24,6 +25,7 @@ namespace CriminisiAlgorithm
             int width = imageStructure.GetLength(1);
             int height = imageStructure.GetLength(0);
 
+            // ne asiguram ca regiune data se gaseste in limitele imaginii
             Size.Width = Math.Min(Size.Width, width - TopLeft.X);
             Size.Height = Math.Min(Size.Height, height - TopLeft.Y);
 

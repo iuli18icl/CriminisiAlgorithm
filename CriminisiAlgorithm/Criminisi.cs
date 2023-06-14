@@ -18,6 +18,7 @@ namespace CriminisiAlgorithm
         public int Lambda { get; set; }
         public Ros ROS { get; set; }
 
+        // Fiecare bloc este format din matrici separate pentru fiecare nivel de culoare RGB
         public void DivideImageIntoBlocks(Image image, int BlockSize, int Step)
         {
             byte[,,] imageStructure = Utils.ConvertImageToByteArray(image);

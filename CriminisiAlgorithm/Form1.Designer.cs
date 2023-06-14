@@ -99,6 +99,7 @@
             this.button3.TabIndex = 34;
             this.button3.Text = "Compute";
             this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.Compute_Click);
             // 
             // label9
             // 
@@ -118,6 +119,7 @@
             this.checkBox1.TabIndex = 36;
             this.checkBox1.Text = "RGB";
             this.checkBox1.UseVisualStyleBackColor = true;
+            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // checkBox2
             // 
