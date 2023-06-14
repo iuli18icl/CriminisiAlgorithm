@@ -55,12 +55,9 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="IResult.cs" />
-    <Compile Include="Operation.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ResultRGB.cs" />
     <Compile Include="Ros.cs" />
     <Compile Include="Size.cs" />
     <Compile Include="Utils.cs" />

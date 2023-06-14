@@ -80,6 +80,7 @@
             this.checkBox3.TabIndex = 32;
             this.checkBox3.Text = "AND";
             this.checkBox3.UseVisualStyleBackColor = true;
+            this.checkBox3.CheckedChanged += new System.EventHandler(this.checkBox3_CheckedChanged);
             // 
             // checkBox4
             // 
@@ -90,6 +91,7 @@
             this.checkBox4.TabIndex = 33;
             this.checkBox4.Text = "OR";
             this.checkBox4.UseVisualStyleBackColor = true;
+            this.checkBox4.CheckedChanged += new System.EventHandler(this.checkBox4_CheckedChanged);
             // 
             // button3
             // 

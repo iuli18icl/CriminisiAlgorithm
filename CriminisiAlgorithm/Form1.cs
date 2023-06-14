@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -120,7 +122,7 @@ namespace CriminisiAlgorithm
                                             diffBluePixels[i, j] = 1;
                                         else diffBluePixels[i, j] = 0;
 
-                                        BlockRGB differenceBlock = new BlockRGB(new Point(i, j), new Size(blockSize, blockSize), diffRedPixels, diffGreenPixels, diffBluePixels);
+                                        BlockRGB differenceBlock = new BlockRGB(new Point(0, 0), new Size(blockSize, blockSize), diffRedPixels, diffGreenPixels, diffBluePixels);
                                         diffValues.Add(differenceBlock);
                                     }
                                 }
@@ -129,6 +131,49 @@ namespace CriminisiAlgorithm
                                 //BlockRGB differenceBlock = ComputeDifference(rosBlock, imageBlock);
                                 //diffValues.Add(differenceBlock);
                             }
+                        }
+                    }
+
+                    List<byte[,]> finalDiffValues = new List<byte[,]>();
+
+                    if (isANDChecked)
+                    {
+                        Console.WriteLine("AND checked");
+
+                        foreach (BlockRGB element in diffValues)
+                        {
+                            byte[,] resultMatrix = new byte[blockSize, blockSize];
+
+                            for (int i = 0; i < blockSize; i++)
+                            {
+                                for (int j = 0; j < blockSize; j++)
+                                {
+                                    // Perform the AND operation
+                                    resultMatrix[i, j] = (byte)(element.RedPixels[i, j] & element.GreenPixels[i, j] & element.BluePixels[i, j]);
+                                }
+                            }
+
+                            finalDiffValues.Add(resultMatrix);
+                        }
+                    }
+                    else if (isORChecked)
+                    {
+                        Console.WriteLine("OR checked");
+
+                        foreach (BlockRGB element in diffValues)
+                        {
+                            byte[,] resultMatrix = new byte[blockSize, blockSize];
+
+                            for (int i = 0; i < blockSize; i++)
+                            {
+                                for (int j = 0; j < blockSize; j++)
+                                {
+                                    // Perform the AND operation
+                                    resultMatrix[i, j] = (byte)(element.RedPixels[i, j] | element.GreenPixels[i, j] | element.BluePixels[i, j]);
+                                }
+                            }
+
+                            finalDiffValues.Add(resultMatrix);
                         }
                     }
 
@@ -218,6 +263,17 @@ namespace CriminisiAlgorithm
                         return new BlockRGB(block1.TopLeft, block1.Size, diffRedPixels, diffGreenPixels, diffBluePixels);
                     }
 
+                    if (finalDiffValues.Count > 0)
+                    {
+                        Console.WriteLine("First element from finalDiffValues:");
+
+                        PrintMatrix(finalDiffValues[0]);
+                    }
+                    else
+                    {
+                        Console.WriteLine("No matrices in the list.");
+                    }
+
                     // Helper method to print a matrix
                     void PrintMatrix(byte[,] matrix)
                     {
@@ -243,6 +299,18 @@ namespace CriminisiAlgorithm
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             isRGBChecked = checkBox1.Checked;
+        }
+
+        private bool isANDChecked = false;
+        private void checkBox3_CheckedChanged(object sender, EventArgs e)
+        {
+            isANDChecked = checkBox3.Checked;
+        }
+
+        private bool isORChecked = false;
+        private void checkBox4_CheckedChanged(object sender, EventArgs e)
+        {
+            isORChecked = checkBox4.Checked;
         }
     }
 }
