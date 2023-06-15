@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml.Math;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -176,6 +177,53 @@ namespace CriminisiAlgorithm
                             finalDiffValues.Add(resultMatrix);
                         }
                     }
+
+                    // Conectivity
+                    // rezultFinal calculez connectivity             
+                    // daca connectivity este mai mare ca un threshold si fuzzy membership e ok
+                    // si daca connectivity este cel mai mare obtinut petrnu acest block il stochez in lista de bestMatch
+
+                    List<IBlock> bestMatch = new List<IBlock>(); 
+
+                    foreach (byte[,] element in finalDiffValues)
+                    {
+                        ComponentCalculator componentCalculator = new ComponentCalculator();
+                        int connectivity = componentCalculator.GetMatchingDegree(element);
+
+                        // Check if connectivity is greater than a threshold
+                        int threshold = 50; // Change the threshold value as needed
+                        if (connectivity > threshold)
+                        {
+                            // Compute fuzzy membership
+                            FuzzyDictionary fuzzyDictionary = FuzzyCompute.ComputeFuzzyMembership();
+                            double fuzzyMembership = fuzzyDictionary.fuzzyMembershipComputed[connectivity];
+
+                            // Check if fuzzy membership is within an acceptable range
+                            double fuzzyMembershipLowerBound = 0.3; // Change the lower bound value as needed
+                            double fuzzyMembershipUpperBound = 0.8; // Change the upper bound value as needed
+                            if (fuzzyMembership >= fuzzyMembershipLowerBound && fuzzyMembership <= fuzzyMembershipUpperBound)
+                            {
+                                // Check if connectivity is the highest obtained in this block
+                                bool isHighestConnectivity = true;
+                                foreach (IBlock block in bestMatch)
+                                {
+                                    int blockConnectivity = componentCalculator.GetMatchingDegree(block);
+                                    if (connectivity < blockConnectivity)
+                                    {
+                                        isHighestConnectivity = false;
+                                        break;
+                                    }
+                                }
+
+                                if (isHighestConnectivity)
+                                {
+                                    // Store the current block in the bestMatch list
+                                    bestMatch.Add(element);
+                                }
+                            }
+                        }
+                    }
+
 
                     //  Verificare
                     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
