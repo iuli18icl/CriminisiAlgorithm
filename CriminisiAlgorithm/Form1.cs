@@ -25,23 +25,6 @@ namespace CriminisiAlgorithm
             }
         }
 
-        // Create the black image
-        private Bitmap CreateBlackImage(Bitmap originalImage)
-        {
-            int width = originalImage.Width;
-            int height = originalImage.Height;
-
-            Bitmap blackImage = new Bitmap(width, height);
-
-            using (Graphics g = Graphics.FromImage(blackImage))
-            {
-                g.Clear(Color.Black);
-            }
-
-            return blackImage;
-        }
-
-
         public Form1()
         {
             InitializeComponent();
@@ -102,10 +85,16 @@ namespace CriminisiAlgorithm
                     imgBlocks.DivideRGBImageIntoBlocks(pictureBox1.Image, blockSize, stepSize);
                     List<IBlock> imageBlocks = imgBlocks.Blocks;
 
-                    List<IBlock> diffValues = new List<IBlock>();
+                    List<BlockRGB> diffValues = new List<BlockRGB>();
+                    var fuzzyDict = FuzzyCompute.ComputeFuzzyMembership();
+
+                    List<byte[,]> finalDiffValues = new List<byte[,]>();
 
                     foreach (BlockRGB rosBlock in rosBlocks)
                     {
+                        double maxFuzzy = int.MinValue;
+                        BlockGrayscale maxBlock = null;
+
                         foreach (BlockRGB imageBlock in imageBlocks)
                         {
                             if (!Utils.CheckOverlap(Utils.BlockToRectangle(rosBlock), Utils.BlockToRectangle(imageBlock)))
@@ -113,6 +102,7 @@ namespace CriminisiAlgorithm
                                 byte[,] diffRedPixels = new byte[blockSize, blockSize];
                                 byte[,] diffGreenPixels = new byte[blockSize, blockSize];
                                 byte[,] diffBluePixels = new byte[blockSize, blockSize];
+                                byte[,] diffPixels = new byte[blockSize, blockSize];
 
                                 for (int i = 0; i < blockSize; i++)
                                 {
@@ -134,97 +124,33 @@ namespace CriminisiAlgorithm
                                             diffBluePixels[i, j] = 1;
                                         else diffBluePixels[i, j] = 0;
 
-                                        BlockRGB differenceBlock = new BlockRGB(new Point(0, 0), new Size(blockSize, blockSize), diffRedPixels, diffGreenPixels, diffBluePixels);
-                                        diffValues.Add(differenceBlock); //!!!!!!!??????????
+                                        diffPixels[i, j] = (isANDChecked == true)
+                                            ? (byte)(diffRedPixels[i, j] & diffGreenPixels[i, j] & diffBluePixels[i, j])
+                                            : (byte)(diffRedPixels[i, j] | diffGreenPixels[i, j] | diffBluePixels[i, j]);
                                     }
                                 }
 
-                                //if we use the method ComputeDifference from BlockRGB class
-                                //BlockRGB differenceBlock = ComputeDifference(rosBlock, imageBlock);
-                                //diffValues.Add(differenceBlock);
-                            }
-                        }
-                    }
+                                ComponentCalculator calculator = new ComponentCalculator();
 
-                    List<byte[,]> finalDiffValues = new List<byte[,]>();
-
-                    if (isANDChecked)
-                    {
-                        Console.WriteLine("AND checked");
-
-                        foreach (BlockRGB element in diffValues)
-                        {
-                            byte[,] resultMatrix = new byte[blockSize, blockSize];
-
-                            for (int i = 0; i < blockSize; i++)
-                            {
-                                for (int j = 0; j < blockSize; j++)
+                                BlockGrayscale differenceBlock = new BlockGrayscale(new Point(0, 0), new Size(blockSize, blockSize), diffPixels);
+                                var x = calculator.GetMatchingDegree(diffPixels);
+                                if (x != -1)
                                 {
-                                    resultMatrix[i, j] = (byte)(element.RedPixels[i, j] & element.GreenPixels[i, j] & element.BluePixels[i, j]);
+                                    var fuzzyValue = fuzzyDict.fuzzyMembershipComputed[x];
+                                    if (fuzzyValue > maxFuzzy && fuzzyValue >= threshold)
+                                    {
+                                        maxFuzzy = fuzzyValue;
+                                        maxBlock = differenceBlock;
+                                    }
                                 }
                             }
-
-                            finalDiffValues.Add(resultMatrix);
                         }
-                    }
-                    else if (isORChecked)
-                    {
-                        Console.WriteLine("OR checked");
 
-                        foreach (BlockRGB element in diffValues)
+                        if (maxBlock != null)
                         {
-                            byte[,] resultMatrix = new byte[blockSize, blockSize];
-
-                            for (int i = 0; i < blockSize; i++)
-                            {
-                                for (int j = 0; j < blockSize; j++)
-                                {
-                                    resultMatrix[i, j] = (byte)(element.RedPixels[i, j] | element.GreenPixels[i, j] | element.BluePixels[i, j]);
-                                }
-                            }
-
-                            finalDiffValues.Add(resultMatrix);
+                            diffValues.Add(rosBlock);
                         }
                     }
-
-                    //Conectivity RGB
-                    ComponentCalculator calculator = new ComponentCalculator();
-                    int bestMatch = 0; 
-                    byte[,] listOfBestMatch = null;
-
-                    FuzzyDictionary fuzzyDictionary = FuzzyCompute.ComputeFuzzyMembership();
-
-                    foreach (byte[,] binarizedBlock in finalDiffValues)
-                    {
-                        //var fuzzy = FuzzyCompute.ComputeFuzzyMembership();
-                        //if (fuzzy)
-                        //{
-                            int matchingDegree = calculator.GetMatchingDegree(binarizedBlock);
-                            if (matchingDegree > bestMatch && matchingDegree > threshold)
-                            {
-                                bestMatch = matchingDegree;
-                                listOfBestMatch = binarizedBlock;
-                            }
-                        //}
-                    }
-
-                    //Bitmap blackImage = CreateBlackImage((Bitmap)pictureBox1.Image);
-
-                    //foreach (byte[,] bestMatch in listOfBestMatch)
-                    //{
-                    //    Point blockPosition = 
-                    //    Size blockSize = 
-
-                    //    Rectangle blockRectangle = new Rectangle(blockPosition, blockSize);
-
-                    //    for (int x = blockRectangle.Left; x < blockRectangle.Right; x++)
-                    //    {
-                    //        for (int y = blockRectangle.Top; y < blockRectangle.Bottom; y++)
-                    //        {
-                    //            blackImage.SetPixel(x, y, Color.White);
-                    //        }
-                    //    }
-                    //}
                 }
             }
             else if (isGrayscaleChecked)
@@ -264,10 +190,15 @@ namespace CriminisiAlgorithm
                     imgBlocks.DivideGrayscaleImageIntoBlocks(pictureBox1.Image, blockSize, stepSize);
                     List<IBlock> imageBlocks = imgBlocks.Blocks;
 
-                    List<byte[,]> diffValues = new List<byte[,]>();
+                    List<BlockGrayscale> diffValues = new List<BlockGrayscale>();
+                    var fuzzyDict = FuzzyCompute.ComputeFuzzyMembership();
 
                     foreach (BlockGrayscale rosBlock in rosBlocks)
                     {
+                        double maxFuzzy = int.MinValue;
+                        BlockGrayscale maxBlock = null;
+
+
                         foreach (BlockGrayscale imageBlock in imageBlocks)
                         {
                             if (!Utils.CheckOverlap(Utils.BlockToRectangle(rosBlock), Utils.BlockToRectangle(imageBlock)))
@@ -284,42 +215,31 @@ namespace CriminisiAlgorithm
                                             diffPixels[i, j] = 1;
                                         else
                                             diffPixels[i, j] = 0;
-
-                                        BlockGrayscale differenceBlock = new BlockGrayscale(new Point(0, 0), new Size(blockSize, blockSize), diffPixels);
-                                        diffValues.Add(differenceBlock.Pixels);
                                     }
                                 }
 
-
-                                //byte[,] differenceBlockToByteArray = new byte[height, width];
-
-                                //for (int i = 0; i < height; i++)
-                                //{
-                                //    for (int j = 0; j < width; j++)
-                                //    {
-                                //        differenceBlockToByteArray[i, j] = (byte)differenceBlock[i, j];
-                                //    }
-                                //}
-
-                                //diffValues.Add(differenceBlockToByteArray);
+                                ComponentCalculator calculator = new ComponentCalculator();
+                                
+                                BlockGrayscale differenceBlock = new BlockGrayscale(new Point(0, 0), new Size(blockSize, blockSize), diffPixels);
+                                var x = calculator.GetMatchingDegree(diffPixels);
+                                if(x != -1)
+                                {
+                                    var fuzzyValue = fuzzyDict.fuzzyMembershipComputed[x];
+                                    if (fuzzyValue > maxFuzzy && fuzzyValue >= threshold)
+                                    {
+                                        maxFuzzy = fuzzyValue;
+                                        maxBlock = differenceBlock;
+                                    }
+                                }
                             }
                         }
-                    }
 
-                    //Conectivity Grayscale
-                    ComponentCalculator calculator = new ComponentCalculator();
-                    int bestMatch = 0;
-                    byte[,] listOfBestMatch = null;
-
-                    foreach (byte[,] binarizedBlock in diffValues)
-                    {
-                        int matchingDegree = calculator.GetMatchingDegree(binarizedBlock);
-                        if (matchingDegree > bestMatch)
+                        if (maxBlock != null)
                         {
-                            bestMatch = matchingDegree;
-                            listOfBestMatch = binarizedBlock;
+                            diffValues.Add(rosBlock);
                         }
                     }
+
                 }
             }
         }

@@ -71,6 +71,7 @@ namespace CriminisiAlgorithm
             {
                 CCStatsOp[] statsop;
                 statsop = new CCStatsOp[nLabels];
+
                 stats.CopyTo(statsop);
                 var resul = binarizedBlock.ToMatrixString();
                 int maximumArea = 0;
