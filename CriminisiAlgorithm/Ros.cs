@@ -15,10 +15,11 @@ namespace CriminisiAlgorithm
         public Point TopLeft { get; set; }
         public Size Size { get; set; }
 
+        ///////////// RGB /////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Fiecare bloc este format din matrici separate pentru fiecare nivel de culoare RGB
-        public void LoadBlocks(Image image, int blockSize, Point TopLeft, Size Size, int stepSize)
+        public void LoadRGBBlocks(Image image, int blockSize, Point TopLeft, Size Size, int stepSize)
         {
-            byte[,,] imageStructure = Utils.ConvertImageToByteArray(image);
+            byte[,,] imageStructure = Utils.ImageToByteArray(image);
 
             List <IBlock> blocks = new List<IBlock>();
 
@@ -58,6 +59,47 @@ namespace CriminisiAlgorithm
 
             Blocks = blocks;
         }
+
+        ///////////// Greyscale /////////////////////////////////////////////////////////////////////////////////////////////////////////
+        public void LoadGrayscaleBlocks(Image image, int blockSize, Point TopLeft, Size Size, int stepSize)
+        {
+            byte[,] imageStructure = Utils.ConvertImageToGrayscaleArray(image);
+
+            List<IBlock> blocks = new List<IBlock>();
+
+            int width = imageStructure.GetLength(1);
+            int height = imageStructure.GetLength(0);
+
+            // Make sure the given region is within the image boundaries
+            Size.Width = Math.Min(Size.Width, width - TopLeft.X);
+            Size.Height = Math.Min(Size.Height, height - TopLeft.Y);
+
+            int endX = TopLeft.X + Size.Width;
+            int endY = TopLeft.Y + Size.Height;
+
+            for (int i = TopLeft.X; i <= endX - blockSize; i += stepSize)
+            {
+                for (int j = TopLeft.Y; j <= endY - blockSize; j += stepSize)
+                {
+                    byte[,] blockData = new byte[blockSize, blockSize];
+
+                    for (int x = 0; x < blockSize; x++)
+                    {
+                        for (int y = 0; y < blockSize; y++)
+                        {
+                            blockData[x, y] = imageStructure[i + x, j + y];
+                        }
+                    }
+
+                    BlockGrayscale blockStructure = new BlockGrayscale(new Point(i, j), Size, blockData);
+
+                    blocks.Add(blockStructure);
+                }
+            }
+
+            Blocks = blocks;
+        }
+
 
     }
 }

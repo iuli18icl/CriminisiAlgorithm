@@ -12,8 +12,9 @@ namespace CriminisiAlgorithm
         public int Area;
     }
 
-    public static class Conectivity
+    public static class UtilsForConnectivity
     {
+        //ToMatrixString(matrix of any type 'T' , delimiter)
         public static string ToMatrixString<T>(this T[,] matrix, string delimiter = "\t")
         {
             var s = new StringBuilder();
@@ -58,9 +59,9 @@ namespace CriminisiAlgorithm
         {
             var resulx = binarizedBlock.ToMatrixString();
 
-            byte[] depthPixelData = new byte[binarizedBlock.Length]; // your data
+            byte[] depthPixelData = new byte[binarizedBlock.Length]; 
             Buffer.BlockCopy(binarizedBlock, 0, depthPixelData, 0, binarizedBlock.Length);
-            Bitmap bitmap = Conectivity.CopyDataToBitmap(binarizedBlock, binarizedBlock.GetLength(0), binarizedBlock.GetLength(1)); // CopyDataToBitmap(depthPixelData, binarizedBlock.GetLength(0), binarizedBlock.GetLength(1));
+            Bitmap bitmap = UtilsForConnectivity.CopyDataToBitmap(binarizedBlock, binarizedBlock.GetLength(0), binarizedBlock.GetLength(1)); // CopyDataToBitmap(depthPixelData, binarizedBlock.GetLength(0), binarizedBlock.GetLength(1));
             Image<Gray, byte> depthImage = bitmap.ToImage<Gray, byte>();
             var labels = new Mat();
             var stats = new Mat();

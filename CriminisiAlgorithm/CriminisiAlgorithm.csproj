@@ -63,9 +63,10 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BlockGrayscale.cs" />
     <Compile Include="BlockRGB.cs" />
-    <Compile Include="Conectivity.cs" />
-    <Compile Include="Criminisi.cs" />
+    <Compile Include="Connectivity.cs" />
+    <Compile Include="IMG.cs" />
     <Compile Include="FuzzyCompute.cs" />
     <Compile Include="FuzzyDictionary.cs" />
     <Compile Include="IBlock.cs" />

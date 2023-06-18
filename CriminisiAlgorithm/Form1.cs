@@ -1,14 +1,6 @@
-﻿using DocumentFormat.OpenXml.Math;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace CriminisiAlgorithm
@@ -33,6 +25,23 @@ namespace CriminisiAlgorithm
             }
         }
 
+        // Create the black image
+        private Bitmap CreateBlackImage(Bitmap originalImage)
+        {
+            int width = originalImage.Width;
+            int height = originalImage.Height;
+
+            Bitmap blackImage = new Bitmap(width, height);
+
+            using (Graphics g = Graphics.FromImage(blackImage))
+            {
+                g.Clear(Color.Black);
+            }
+
+            return blackImage;
+        }
+
+
         public Form1()
         {
             InitializeComponent();
@@ -50,13 +59,14 @@ namespace CriminisiAlgorithm
 
         private void Compute_Click(object sender, EventArgs e)
         {
-
+        ///////////// RGB /////////////////////////////////////////////////////////////////////////////////////////////////////////
             if (isRGBChecked)
             {
                 Console.WriteLine("rgb checked");
                 if (image != null)
                 {
                     Console.WriteLine("image good");
+
                     Bitmap bitmap = new Bitmap(image);
 
                     int width = bitmap.Width;
@@ -77,6 +87,7 @@ namespace CriminisiAlgorithm
                     int rosWidth = width / 2;
                     int rosHeight = height / 2;
                     int lambda = 0;
+                    int threshold = 0;
 
                     //Rectangle first = new Rectangle(1, 1, 5, 5);
                     //Rectangle second = new Rectangle(4, 7, 3, 3);
@@ -84,12 +95,12 @@ namespace CriminisiAlgorithm
                     //Console.WriteLine(rez);
 
                     Ros ros = new Ros();
-                    ros.LoadBlocks(pictureBox1.Image, blockSize, new Point(startX, startY), new Size(rosWidth, rosHeight), stepSize);
+                    ros.LoadRGBBlocks(pictureBox1.Image, blockSize, new Point(startX, startY), new Size(rosWidth, rosHeight), stepSize);
                     List<IBlock> rosBlocks = ros.Blocks;
 
-                    Criminisi criminisi = new Criminisi();
-                    criminisi.DivideImageIntoBlocks(pictureBox1.Image, blockSize, stepSize);
-                    List<IBlock> imageBlocks = criminisi.Blocks;
+                    IMG imgBlocks = new IMG();
+                    imgBlocks.DivideRGBImageIntoBlocks(pictureBox1.Image, blockSize, stepSize);
+                    List<IBlock> imageBlocks = imgBlocks.Blocks;
 
                     List<IBlock> diffValues = new List<IBlock>();
 
@@ -124,7 +135,7 @@ namespace CriminisiAlgorithm
                                         else diffBluePixels[i, j] = 0;
 
                                         BlockRGB differenceBlock = new BlockRGB(new Point(0, 0), new Size(blockSize, blockSize), diffRedPixels, diffGreenPixels, diffBluePixels);
-                                        diffValues.Add(differenceBlock);
+                                        diffValues.Add(differenceBlock); //!!!!!!!??????????
                                     }
                                 }
 
@@ -149,7 +160,6 @@ namespace CriminisiAlgorithm
                             {
                                 for (int j = 0; j < blockSize; j++)
                                 {
-                                    // Perform the AND operation
                                     resultMatrix[i, j] = (byte)(element.RedPixels[i, j] & element.GreenPixels[i, j] & element.BluePixels[i, j]);
                                 }
                             }
@@ -169,7 +179,6 @@ namespace CriminisiAlgorithm
                             {
                                 for (int j = 0; j < blockSize; j++)
                                 {
-                                    // Perform the AND operation
                                     resultMatrix[i, j] = (byte)(element.RedPixels[i, j] | element.GreenPixels[i, j] | element.BluePixels[i, j]);
                                 }
                             }
@@ -178,175 +187,156 @@ namespace CriminisiAlgorithm
                         }
                     }
 
-                    // Conectivity
-                    // rezultFinal calculez connectivity             
-                    // daca connectivity este mai mare ca un threshold si fuzzy membership e ok
-                    // si daca connectivity este cel mai mare obtinut petrnu acest block il stochez in lista de bestMatch
+                    //Conectivity RGB
+                    ComponentCalculator calculator = new ComponentCalculator();
+                    int bestMatch = 0; 
+                    byte[,] listOfBestMatch = null;
 
-                    List<IBlock> bestMatch = new List<IBlock>(); 
+                    FuzzyDictionary fuzzyDictionary = FuzzyCompute.ComputeFuzzyMembership();
 
-                    foreach (byte[,] element in finalDiffValues)
+                    foreach (byte[,] binarizedBlock in finalDiffValues)
                     {
-                        ComponentCalculator componentCalculator = new ComponentCalculator();
-                        int connectivity = componentCalculator.GetMatchingDegree(element);
-
-                        // Check if connectivity is greater than a threshold
-                        int threshold = 50; // Change the threshold value as needed
-                        if (connectivity > threshold)
-                        {
-                            // Compute fuzzy membership
-                            FuzzyDictionary fuzzyDictionary = FuzzyCompute.ComputeFuzzyMembership();
-                            double fuzzyMembership = fuzzyDictionary.fuzzyMembershipComputed[connectivity];
-
-                            // Check if fuzzy membership is within an acceptable range
-                            double fuzzyMembershipLowerBound = 0.3; // Change the lower bound value as needed
-                            double fuzzyMembershipUpperBound = 0.8; // Change the upper bound value as needed
-                            if (fuzzyMembership >= fuzzyMembershipLowerBound && fuzzyMembership <= fuzzyMembershipUpperBound)
+                        //var fuzzy = FuzzyCompute.ComputeFuzzyMembership();
+                        //if (fuzzy)
+                        //{
+                            int matchingDegree = calculator.GetMatchingDegree(binarizedBlock);
+                            if (matchingDegree > bestMatch && matchingDegree > threshold)
                             {
-                                // Check if connectivity is the highest obtained in this block
-                                bool isHighestConnectivity = true;
-                                foreach (IBlock block in bestMatch)
+                                bestMatch = matchingDegree;
+                                listOfBestMatch = binarizedBlock;
+                            }
+                        //}
+                    }
+
+                    //Bitmap blackImage = CreateBlackImage((Bitmap)pictureBox1.Image);
+
+                    //foreach (byte[,] bestMatch in listOfBestMatch)
+                    //{
+                    //    Point blockPosition = 
+                    //    Size blockSize = 
+
+                    //    Rectangle blockRectangle = new Rectangle(blockPosition, blockSize);
+
+                    //    for (int x = blockRectangle.Left; x < blockRectangle.Right; x++)
+                    //    {
+                    //        for (int y = blockRectangle.Top; y < blockRectangle.Bottom; y++)
+                    //        {
+                    //            blackImage.SetPixel(x, y, Color.White);
+                    //        }
+                    //    }
+                    //}
+                }
+            }
+            else if (isGrayscaleChecked)
+            {
+                Console.WriteLine("grayscsale checked");
+                if (image != null)
+                {
+                    Console.WriteLine("image good");
+
+                    Bitmap bitmap = new Bitmap(image);
+
+                    int width = bitmap.Width;
+                    int height = bitmap.Height;
+
+                    //int blockSize = int.Parse(textBox1.Text);
+                    //int stepSize = int.Parse(textBox2.Text);
+                    //int startX = int.Parse(textBox3.Text);
+                    //int startY = int.Parse(textBox4.Text);
+                    //int rosWidth = int.Parse(textBox5.Text);
+                    //int rosHeight = int.Parse(textBox6.Text);
+                    //int limit = int.Parse(textBox7.Text);
+
+                    int blockSize = 5;
+                    int stepSize = 5;
+                    int startX = 100;
+                    int startY = 200;
+                    int rosWidth = width / 2;
+                    int rosHeight = height / 2;
+                    int lambda = 0;
+                    int threshold = 0;
+
+                    Ros ros = new Ros();
+                    ros.LoadGrayscaleBlocks(pictureBox1.Image, blockSize, new Point(startX, startY), new Size(rosWidth, rosHeight), stepSize);
+                    List<IBlock> rosBlocks = ros.Blocks;
+
+                    IMG imgBlocks = new IMG();
+                    imgBlocks.DivideGrayscaleImageIntoBlocks(pictureBox1.Image, blockSize, stepSize);
+                    List<IBlock> imageBlocks = imgBlocks.Blocks;
+
+                    List<byte[,]> diffValues = new List<byte[,]>();
+
+                    foreach (BlockGrayscale rosBlock in rosBlocks)
+                    {
+                        foreach (BlockGrayscale imageBlock in imageBlocks)
+                        {
+                            if (!Utils.CheckOverlap(Utils.BlockToRectangle(rosBlock), Utils.BlockToRectangle(imageBlock)))
+                            {
+                                byte[,] diffPixels = new byte[blockSize, blockSize];
+
+                                for (int i = 0; i < blockSize; i++)
                                 {
-                                    int blockConnectivity = componentCalculator.GetMatchingDegree(block);
-                                    if (connectivity < blockConnectivity)
+                                    for (int j = 0; j < blockSize; j++)
                                     {
-                                        isHighestConnectivity = false;
-                                        break;
+                                        diffPixels[i, j] = (byte)Math.Abs(rosBlock.Pixels[i, j] - imageBlock.Pixels[i, j]);
+
+                                        if (diffPixels[i, j] <= lambda)
+                                            diffPixels[i, j] = 1;
+                                        else
+                                            diffPixels[i, j] = 0;
+
+                                        BlockGrayscale differenceBlock = new BlockGrayscale(new Point(0, 0), new Size(blockSize, blockSize), diffPixels);
+                                        diffValues.Add(differenceBlock.Pixels);
                                     }
                                 }
 
-                                if (isHighestConnectivity)
-                                {
-                                    // Store the current block in the bestMatch list
-                                    bestMatch.Add(element);
-                                }
+
+                                //byte[,] differenceBlockToByteArray = new byte[height, width];
+
+                                //for (int i = 0; i < height; i++)
+                                //{
+                                //    for (int j = 0; j < width; j++)
+                                //    {
+                                //        differenceBlockToByteArray[i, j] = (byte)differenceBlock[i, j];
+                                //    }
+                                //}
+
+                                //diffValues.Add(differenceBlockToByteArray);
                             }
                         }
                     }
 
+                    //Conectivity Grayscale
+                    ComponentCalculator calculator = new ComponentCalculator();
+                    int bestMatch = 0;
+                    byte[,] listOfBestMatch = null;
 
-                    //  Verificare
-                    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    // Print the first block from rosBlocks
-                    BlockRGB firstRosBlock = (BlockRGB)rosBlocks.FirstOrDefault();
-                    if (firstRosBlock != null)
+                    foreach (byte[,] binarizedBlock in diffValues)
                     {
-                        Console.WriteLine("First ROS Block:");
-                        Console.WriteLine($"Coordinates: {firstRosBlock.TopLeft}");
-                        Console.WriteLine($"Size: {firstRosBlock.Size}");
-                        Console.WriteLine("Color Components:");
-                        Console.WriteLine("Red:");
-                        PrintMatrix(firstRosBlock.RedPixels);
-                        Console.WriteLine("Green:");
-                        PrintMatrix(firstRosBlock.GreenPixels);
-                        Console.WriteLine("Blue:");
-                        PrintMatrix(firstRosBlock.BluePixels);
-                    }
-
-                    // Print the last block from imageBlock
-                    BlockRGB lastImageBlock = (BlockRGB)imageBlocks.LastOrDefault();
-                    if (lastImageBlock != null)
-                    {
-                        Console.WriteLine("Last Image Block:");
-                        Console.WriteLine($"Coordinates: {lastImageBlock.TopLeft}");
-                        Console.WriteLine($"Size: {lastImageBlock.Size}");
-                        Console.WriteLine("Color Components:");
-                        Console.WriteLine("Red:");
-                        PrintMatrix(lastImageBlock.RedPixels);
-                        Console.WriteLine("Green:");
-                        PrintMatrix(lastImageBlock.GreenPixels);
-                        Console.WriteLine("Blue:");
-                        PrintMatrix(lastImageBlock.BluePixels);
-                    }
-
-                    // Compute the difference between the first block from rosBlocks and the last block from imageBlocks
-                    BlockRGB diffBlock = ComputeDifference(firstRosBlock, lastImageBlock);
-
-                    if (diffBlock != null)
-                    {
-                        Console.WriteLine("Difference Block:");
-                        Console.WriteLine($"Coordinates: {diffBlock.TopLeft}");
-                        Console.WriteLine($"Size: {diffBlock.Size}");
-                        Console.WriteLine("Color Components:");
-                        Console.WriteLine("Red:");
-                        PrintMatrix(diffBlock.RedPixels);
-                        Console.WriteLine("Green:");
-                        PrintMatrix(diffBlock.GreenPixels);
-                        Console.WriteLine("Blue:");
-                        PrintMatrix(diffBlock.BluePixels);
-                    }
-
-                    // Helper method to compute the difference between two blocks
-                    BlockRGB ComputeDifference(BlockRGB block1, BlockRGB block2)
-                    {
-                        if (block1 == null || block2 == null)
-                            return null;
-
-                        byte[,] diffRedPixels = new byte[blockSize, blockSize];
-                        byte[,] diffGreenPixels = new byte[blockSize, blockSize];
-                        byte[,] diffBluePixels = new byte[blockSize, blockSize];
-
-                        for (int i = 0; i < blockSize; i++)
+                        int matchingDegree = calculator.GetMatchingDegree(binarizedBlock);
+                        if (matchingDegree > bestMatch)
                         {
-                            for (int j = 0; j < blockSize; j++)
-                            {
-                                diffRedPixels[i, j] = (byte)Math.Abs(block1.RedPixels[i, j] - block2.RedPixels[i, j]);
-                                diffGreenPixels[i, j] = (byte)Math.Abs(block1.GreenPixels[i, j] - block2.GreenPixels[i, j]);
-                                diffBluePixels[i, j] = (byte)Math.Abs(block1.BluePixels[i, j] - block2.BluePixels[i, j]);
-
-                                if (diffRedPixels[i, j] <= lambda)
-                                    diffRedPixels[i, j] = 1;
-                                else diffRedPixels[i, j] = 0;
-
-                                if (diffGreenPixels[i, j] <= lambda)
-                                    diffGreenPixels[i, j] = 1;
-                                else diffGreenPixels[i, j] = 0;
-
-                                if (diffBluePixels[i, j] <= lambda)
-                                    diffBluePixels[i, j] = 1;
-                                else diffBluePixels[i, j] = 0;
-                            }
-                        }
-
-                        return new BlockRGB(block1.TopLeft, block1.Size, diffRedPixels, diffGreenPixels, diffBluePixels);
-                    }
-
-                    if (finalDiffValues.Count > 0)
-                    {
-                        Console.WriteLine("First element from finalDiffValues:");
-
-                        PrintMatrix(finalDiffValues[0]);
-                    }
-                    else
-                    {
-                        Console.WriteLine("No matrices in the list.");
-                    }
-
-                    // Helper method to print a matrix
-                    void PrintMatrix(byte[,] matrix)
-                    {
-                        int rows = matrix.GetLength(0);
-                        int columns = matrix.GetLength(1);
-                        for (int i = 0; i < rows; i++)
-                        {
-                            for (int j = 0; j < columns; j++)
-                            {
-                                Console.Write(matrix[i, j] + " ");
-                            }
-                            Console.WriteLine();
+                            bestMatch = matchingDegree;
+                            listOfBestMatch = binarizedBlock;
                         }
                     }
-
-                    /////////////////////////////////////////////////////////////////
                 }
             }
         }
+
+
 
         private bool isRGBChecked = false;
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             isRGBChecked = checkBox1.Checked;
+        }
+
+        private bool isGrayscaleChecked = false;
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            isGrayscaleChecked = checkBox2.Checked;
         }
 
         private bool isANDChecked = false;
