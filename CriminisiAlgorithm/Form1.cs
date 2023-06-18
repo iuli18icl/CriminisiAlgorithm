@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Emgu.CV.Structure;
+using Emgu.CV;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
@@ -8,6 +10,7 @@ namespace CriminisiAlgorithm
     public partial class Form1 : Form
     {
         Image image;
+        Image<Bgr, byte> blackImage;
 
         // load image in picture box and store the image
         public void LoadImageFromFile(PictureBox pictureBox)
@@ -22,6 +25,7 @@ namespace CriminisiAlgorithm
                 image = Image.FromFile(selectedFile);
 
                 pictureBox.Image = image;
+                blackImage = new Image<Bgr, byte>(image.Width, image.Height, new Bgr(0, 0, 0));
             }
         }
 
@@ -42,6 +46,8 @@ namespace CriminisiAlgorithm
 
         private void Compute_Click(object sender, EventArgs e)
         {
+            List<IBlock> diffValues = new List<IBlock>();
+
         ///////////// RGB /////////////////////////////////////////////////////////////////////////////////////////////////////////
             if (isRGBChecked)
             {
@@ -85,7 +91,7 @@ namespace CriminisiAlgorithm
                     imgBlocks.DivideRGBImageIntoBlocks(pictureBox1.Image, blockSize, stepSize);
                     List<IBlock> imageBlocks = imgBlocks.Blocks;
 
-                    List<BlockRGB> diffValues = new List<BlockRGB>();
+                    //diffValues = new List<BlockRGB>();
                     var fuzzyDict = FuzzyCompute.ComputeFuzzyMembership();
 
                     List<byte[,]> finalDiffValues = new List<byte[,]>();
@@ -132,7 +138,7 @@ namespace CriminisiAlgorithm
 
                                 ComponentCalculator calculator = new ComponentCalculator();
 
-                                BlockGrayscale differenceBlock = new BlockGrayscale(new Point(0, 0), new Size(blockSize, blockSize), diffPixels);
+                                BlockGrayscale differenceBlock = new BlockGrayscale(new Point(rosBlock.X, rosBlock.Y), new Size(blockSize, blockSize), diffPixels);
                                 var x = calculator.GetMatchingDegree(diffPixels);
                                 if (x != -1)
                                 {
@@ -190,7 +196,7 @@ namespace CriminisiAlgorithm
                     imgBlocks.DivideGrayscaleImageIntoBlocks(pictureBox1.Image, blockSize, stepSize);
                     List<IBlock> imageBlocks = imgBlocks.Blocks;
 
-                    List<BlockGrayscale> diffValues = new List<BlockGrayscale>();
+                    //List<BlockGrayscale> diffValues = new List<BlockGrayscale>();
                     var fuzzyDict = FuzzyCompute.ComputeFuzzyMembership();
 
                     foreach (BlockGrayscale rosBlock in rosBlocks)
@@ -220,7 +226,7 @@ namespace CriminisiAlgorithm
 
                                 ComponentCalculator calculator = new ComponentCalculator();
                                 
-                                BlockGrayscale differenceBlock = new BlockGrayscale(new Point(0, 0), new Size(blockSize, blockSize), diffPixels);
+                                BlockGrayscale differenceBlock = new BlockGrayscale(new Point(rosBlock.X, rosBlock.Y), new Size(blockSize, blockSize), diffPixels);
                                 var x = calculator.GetMatchingDegree(diffPixels);
                                 if(x != -1)
                                 {
@@ -239,12 +245,32 @@ namespace CriminisiAlgorithm
                             diffValues.Add(rosBlock);
                         }
                     }
-
                 }
             }
+
+            foreach (IBlock diffValue in diffValues)
+            {
+                // Define the rectangle
+                int rectX = diffValue.X; 
+                int rectY = diffValue.Y; 
+                int rectWidth = diffValue.Width; 
+                int rectHeight = diffValue.Height; 
+
+                // To white color
+                Bgr rectangleColor = new Bgr(255, 255, 255);
+
+                for (int y = rectY; y < rectY + rectHeight; y++)
+                {
+                    for (int x = rectX; x < rectX + rectWidth; x++)
+                    {
+                        // Set the pixel color
+                        blackImage[y, x] = rectangleColor;
+                    }
+                }
+
+                pictureBox2.Image = blackImage.ToBitmap();
+            }
         }
-
-
 
         private bool isRGBChecked = false;
 
@@ -269,6 +295,16 @@ namespace CriminisiAlgorithm
         private void checkBox4_CheckedChanged(object sender, EventArgs e)
         {
             isORChecked = checkBox4.Checked;
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void pictureBox2_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
