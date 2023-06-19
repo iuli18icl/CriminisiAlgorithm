@@ -26,6 +26,8 @@ namespace CriminisiAlgorithm
 
                 pictureBox.Image = image;
                 blackImage = new Image<Bgr, byte>(image.Width, image.Height, new Bgr(0, 0, 0));
+
+                pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
             }
         }
 
@@ -52,6 +54,7 @@ namespace CriminisiAlgorithm
             if (isRGBChecked)
             {
                 Console.WriteLine("rgb checked");
+
                 if (image != null)
                 {
                     Console.WriteLine("image good");
@@ -91,7 +94,7 @@ namespace CriminisiAlgorithm
                     imgBlocks.DivideRGBImageIntoBlocks(pictureBox1.Image, blockSize, stepSize);
                     List<IBlock> imageBlocks = imgBlocks.Blocks;
 
-                    //diffValues = new List<BlockRGB>();
+                    FuzzyCompute.SetBlockSize(blockSize);
                     var fuzzyDict = FuzzyCompute.ComputeFuzzyMembership();
 
                     List<byte[,]> finalDiffValues = new List<byte[,]>();
@@ -162,14 +165,15 @@ namespace CriminisiAlgorithm
             else if (isGrayscaleChecked)
             {
                 Console.WriteLine("grayscsale checked");
+
                 if (image != null)
                 {
                     Console.WriteLine("image good");
 
-                    Bitmap bitmap = new Bitmap(image);
+                    //Bitmap bitmap = new Bitmap(image);
 
-                    int width = bitmap.Width;
-                    int height = bitmap.Height;
+                    //int width = bitmap.Width;
+                    //int height = bitmap.Height;
 
                     //int blockSize = int.Parse(textBox1.Text);
                     //int stepSize = int.Parse(textBox2.Text);
@@ -179,12 +183,12 @@ namespace CriminisiAlgorithm
                     //int rosHeight = int.Parse(textBox6.Text);
                     //int limit = int.Parse(textBox7.Text);
 
-                    int blockSize = 5;
-                    int stepSize = 5;
-                    int startX = 100;
-                    int startY = 200;
-                    int rosWidth = width / 2;
-                    int rosHeight = height / 2;
+                    int blockSize = 13;
+                    int stepSize = 10;
+                    int startX = 2;
+                    int startY = 2;
+                    int rosWidth = 190;
+                    int rosHeight = 255;
                     int lambda = 0;
                     int threshold = 0;
 
@@ -196,7 +200,7 @@ namespace CriminisiAlgorithm
                     imgBlocks.DivideGrayscaleImageIntoBlocks(pictureBox1.Image, blockSize, stepSize);
                     List<IBlock> imageBlocks = imgBlocks.Blocks;
 
-                    //List<BlockGrayscale> diffValues = new List<BlockGrayscale>();
+                    FuzzyCompute.SetBlockSize(blockSize);
                     var fuzzyDict = FuzzyCompute.ComputeFuzzyMembership();
 
                     foreach (BlockGrayscale rosBlock in rosBlocks)
@@ -234,7 +238,7 @@ namespace CriminisiAlgorithm
                                     if (fuzzyValue > maxFuzzy && fuzzyValue >= threshold)
                                     {
                                         maxFuzzy = fuzzyValue;
-                                        maxBlock = differenceBlock;
+                                        maxBlock = imageBlock;
                                     }
                                 }
                             }
@@ -242,11 +246,13 @@ namespace CriminisiAlgorithm
 
                         if (maxBlock != null)
                         {
-                            diffValues.Add(rosBlock);
+                            diffValues.Add(maxBlock);
                         }
                     }
                 }
             }
+
+            Console.WriteLine("+");
 
             foreach (IBlock diffValue in diffValues)
             {
@@ -254,47 +260,66 @@ namespace CriminisiAlgorithm
                 int rectX = diffValue.X; 
                 int rectY = diffValue.Y; 
                 int rectWidth = diffValue.Width; 
-                int rectHeight = diffValue.Height; 
+                int rectHeight = diffValue.Height;
+
+                //Console.WriteLine(String.Format("X: {0}, Y: {1}, Width: {2}, Height: {3}", rectX, rectY, rectWidth, rectHeight));
 
                 // To white color
                 Bgr rectangleColor = new Bgr(255, 255, 255);
 
-                for (int y = rectY; y < rectY + rectHeight; y++)
+                for (int i = rectX; i < rectX + rectWidth; i++)
                 {
-                    for (int x = rectX; x < rectX + rectWidth; x++)
+                    for (int j = rectY; j < rectY + rectHeight; j++)
                     {
+                        //Console.WriteLine(String.Format("i: {0}, j: {1}, limits i: {2}, limits j: {3}", i, j, rectX + rectWidth, rectY + rectHeight));
                         // Set the pixel color
-                        blackImage[y, x] = rectangleColor;
+                        blackImage[i, j] = rectangleColor;
                     }
                 }
 
                 pictureBox2.Image = blackImage.ToBitmap();
+
+                Console.WriteLine("!");
             }
         }
 
         private bool isRGBChecked = false;
 
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        private void radioButton1_CheckedChanged(object sender, EventArgs e)
         {
-            isRGBChecked = checkBox1.Checked;
+            isRGBChecked = radioButton1.Checked;
         }
 
         private bool isGrayscaleChecked = false;
-        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        private void radioButton2_CheckedChanged_1(object sender, EventArgs e)
         {
-            isGrayscaleChecked = checkBox2.Checked;
+            isGrayscaleChecked = radioButton2.Checked;
         }
 
         private bool isANDChecked = false;
         private void checkBox3_CheckedChanged(object sender, EventArgs e)
         {
-            isANDChecked = checkBox3.Checked;
+            if (radioButton1.Checked)
+            {
+                isANDChecked = checkBox3.Checked;
+            }
+            else
+            {
+                Console.WriteLine("RGB is not checked");
+            }
         }
 
         private bool isORChecked = false;
         private void checkBox4_CheckedChanged(object sender, EventArgs e)
         {
-            isORChecked = checkBox4.Checked;
+            if (radioButton1.Checked)
+            {
+                isORChecked = checkBox4.Checked;
+            }
+            else
+            {
+                Console.WriteLine("RGB is not checked");
+            }
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)

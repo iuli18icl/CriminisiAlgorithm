@@ -17,16 +17,16 @@ namespace CriminisiAlgorithm
             int width = bitmap.Width;
             int height = bitmap.Height;
 
-            byte[,,] imageArray = new byte[height, width, 3];
+            byte[,,] imageArray = new byte[width, height, 3];
 
-            for (int y = 0; y < height; y++)
+            for (int i = 0; i < width; i++)
             {
-                for (int x = 0; x < width; x++)
+                for (int j = 0; j < height; j++)
                 {
-                    Color pixelColor = bitmap.GetPixel(x, y);
-                    imageArray[y, x, 0] = pixelColor.R;
-                    imageArray[y, x, 1] = pixelColor.G;
-                    imageArray[y, x, 2] = pixelColor.B;
+                    Color pixelColor = bitmap.GetPixel(i, j);
+                    imageArray[i, j, 0] = pixelColor.R;
+                    imageArray[i, j, 1] = pixelColor.G;
+                    imageArray[i, j, 2] = pixelColor.B;
                 }
             }
 
@@ -40,15 +40,15 @@ namespace CriminisiAlgorithm
             int width = bitmap.Width;
             int height = bitmap.Height;
 
-            byte[,] grayscaleArray = new byte[height, width];
+            byte[,] grayscaleArray = new byte[width, height];
 
-            for (int y = 0; y < height; y++)
+            for (int x = 0; x < width; x++)
             {
-                for (int x = 0; x < width; x++)
+                for (int y = 0; y < height; y++)
                 {
                     Color pixelColor = bitmap.GetPixel(x, y);
                     byte grayscaleValue = (byte)((pixelColor.R + pixelColor.G + pixelColor.B) / 3);
-                    grayscaleArray[y, x] = grayscaleValue;
+                    grayscaleArray[x, y] = grayscaleValue;
                 }
             }
 

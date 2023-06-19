@@ -30,21 +30,21 @@ namespace CriminisiAlgorithm
 
             List<IBlock> blocks = new List<IBlock>();
 
-            for (int i = 0; i <= height - BlockSize; i += Step)
+            for (int i = 0; i <= width - BlockSize; i += Step)
             {
-                for (int j = 0; j <= width - BlockSize; j += Step)
+                for (int j = 0; j <= height  - BlockSize; j += Step)
                 {
                     byte[,] blockR = new byte[BlockSize, BlockSize];
                     byte[,] blockG = new byte[BlockSize, BlockSize];
                     byte[,] blockB = new byte[BlockSize, BlockSize];
 
-                    for (int y = 0; y < BlockSize; y++)
+                    for (int x = 0; x < BlockSize; x++)
                     {
-                        for (int x = 0; x < BlockSize; x++)
+                        for (int y = 0; y < BlockSize; y++)
                         {
-                            blockR[y, x] = imageStructure[i + y, j + x, 0]; // Red channel
-                            blockG[y, x] = imageStructure[i + y, j + x, 1]; // Green channel
-                            blockB[y, x] = imageStructure[i + y, j + x, 2]; // Blue channel
+                            blockR[x, y] = imageStructure[i + x, j + y, 0]; // Red channel
+                            blockG[x, y] = imageStructure[i + x, j + y, 1]; // Green channel
+                            blockB[x, y] = imageStructure[i + x, j + y, 2]; // Blue channel
                         }
                     }
 
@@ -68,21 +68,21 @@ namespace CriminisiAlgorithm
 
             List<IBlock> blocks = new List<IBlock>();
 
-            for (int i = 0; i <= height - blockSize; i += step)
+            for (int i = 0; i <= width - blockSize; i += step)
             {
-                for (int j = 0; j <= width - blockSize; j += step)
+                for (int j = 0; j <= height - blockSize; j += step)
                 {
                     byte[,] blockPixels = new byte[blockSize, blockSize];
 
-                    for (int y = 0; y < blockSize; y++)
+                    for (int x = 0; x < blockSize; x++)
                     {
-                        for (int x = 0; x < blockSize; x++)
+                        for (int y = 0; y < blockSize; y++)
                         {
-                            blockPixels[y, x] = imageStructure[i + y, j + x];
+                            blockPixels[x, y] = imageStructure[i + x, j + y];
                         }
                     }
 
-                    BlockGrayscale blockStructure = new BlockGrayscale(new Point(j, i), new Size(blockSize, blockSize), blockPixels);
+                    BlockGrayscale blockStructure = new BlockGrayscale(new Point(i, j), new Size(blockSize, blockSize), blockPixels);
 
                     blocks.Add(blockStructure);
                 }

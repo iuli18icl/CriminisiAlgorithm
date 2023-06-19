@@ -91,7 +91,7 @@ namespace CriminisiAlgorithm
                         }
                     }
 
-                    BlockGrayscale blockStructure = new BlockGrayscale(new Point(i, j), Size, blockData);
+                    BlockGrayscale blockStructure = new BlockGrayscale(new Point(i, j), new Size(blockSize, blockSize), blockData);
 
                     blocks.Add(blockStructure);
                 }

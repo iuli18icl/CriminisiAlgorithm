@@ -14,33 +14,33 @@ namespace CriminisiAlgorithm
 
     public static class UtilsForConnectivity
     {
-        //ToMatrixString(matrix of any type 'T' , delimiter)
-        public static string ToMatrixString<T>(this T[,] matrix, string delimiter = "\t")
-        {
-            var s = new StringBuilder();
+        ////ToMatrixString(matrix of any type 'T' , delimiter)
+        //public static string ToMatrixString<T>(this T[,] matrix, string delimiter = "\t")
+        //{
+        //    var s = new StringBuilder();
 
-            for (var i = 0; i < matrix.GetLength(0); i++)
-            {
-                for (var j = 0; j < matrix.GetLength(1); j++)
-                {
-                    s.Append(matrix[i, j]).Append(delimiter);
-                }
+        //    for (var i = 0; i < matrix.GetLength(0); i++)
+        //    {
+        //        for (var j = 0; j < matrix.GetLength(1); j++)
+        //        {
+        //            s.Append(matrix[i, j]).Append(delimiter);
+        //        }
 
-                s.AppendLine();
-            }
+        //        s.AppendLine();
+        //    }
 
-            return s.ToString();
-        }
+        //    return s.ToString();
+        //}
 
         public static Bitmap CopyDataToBitmap(byte[,] data, int height, int width)
         {
             Bitmap bmp = new Bitmap(width, height); 
 
-            for (int i = 0; i < height; i++)
+            for (int i = 0; i < width; i++)
             {
-                for (int j = 0; j < width; j++)
+                for (int j = 0; j < height; j++)
                 {
-                    bmp.SetPixel(j, i, data[i, j] == 0 ? Color.Black : Color.White);
+                    bmp.SetPixel(i, j, data[i, j] == 0 ? Color.Black : Color.White);
                 }
             }
 
@@ -54,8 +54,6 @@ namespace CriminisiAlgorithm
 
         public int GetMatchingDegree(byte[,] binarizedBlock)
         {
-            var resulx = binarizedBlock.ToMatrixString();
-
             byte[] depthPixelData = new byte[binarizedBlock.Length]; 
             Buffer.BlockCopy(binarizedBlock, 0, depthPixelData, 0, binarizedBlock.Length);
             Bitmap bitmap = UtilsForConnectivity.CopyDataToBitmap(binarizedBlock, binarizedBlock.GetLength(0), binarizedBlock.GetLength(1)); // CopyDataToBitmap(depthPixelData, binarizedBlock.GetLength(0), binarizedBlock.GetLength(1));
@@ -70,7 +68,6 @@ namespace CriminisiAlgorithm
                 statsop = new CCStatsOp[nLabels];
 
                 stats.CopyTo(statsop);
-                var resul = binarizedBlock.ToMatrixString();
                 int maximumArea = 0;
                 for (int i = 1; i < nLabels; i++)
                 {
