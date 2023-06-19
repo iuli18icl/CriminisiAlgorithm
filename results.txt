@@ -1,0 +1,32 @@
+Time elapsed 00:00:00.40
+TruePositive = 5814
+TrueNegative = 71577
+FalsePositive = 8947
+FalseNegative = 3662
+Time elapsed 00:00:00.18
+TruePositive = 0
+TrueNegative = 80524
+FalsePositive = 0
+FalseNegative = 9476
+
+Time elapsed 00:00:00.46
+TruePositive = 5814
+TrueNegative = 71577
+FalsePositive = 8947
+FalseNegative = 3662
+
+Time elapsed 00:00:23.98
+TruePositive = 4463
+TrueNegative = 48157
+FalsePositive = 32367
+FalseNegative = 5013
+
+Time elapsed 00:02:00.57
+
+
+TruePositive = 5814
+TrueNegative = 71577
+FalsePositive = 8947
+FalseNegative = 3662
+Time elapsed 00:00:27.17
+

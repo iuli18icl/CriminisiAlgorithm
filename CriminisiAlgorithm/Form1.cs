@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Diagnostics;
+using System.IO;
 
 namespace CriminisiAlgorithm
 {
@@ -11,6 +13,9 @@ namespace CriminisiAlgorithm
     {
         Image image;
         Image<Bgr, byte> blackImage;
+        Image originalMask;
+
+        string filename = @"\\Mac\Home\Desktop\Licenta\CriminisiAlgorithm\results.txt";
 
         // load image in picture box and store the image
         public void LoadImageFromFile(PictureBox pictureBox)
@@ -31,10 +36,31 @@ namespace CriminisiAlgorithm
             }
         }
 
+        // Load Original Mask
+        private void button2_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Image Files|*.png";
+            openFileDialog.Title = "Select an Image File";
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string selectedFile = openFileDialog.FileName;
+                originalMask = Image.FromFile(selectedFile);
+
+                pictureBox3.Image = originalMask;
+                pictureBox3.SizeMode = PictureBoxSizeMode.Zoom;
+            }
+        }
+
         public Form1()
         {
             InitializeComponent();
+
+            AutoSize = true;
+            AutoSizeMode = AutoSizeMode.GrowAndShrink;
         }
+
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -48,6 +74,9 @@ namespace CriminisiAlgorithm
 
         private void Compute_Click(object sender, EventArgs e)
         {
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
+
             List<IBlock> diffValues = new List<IBlock>();
 
         ///////////// RGB /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -59,10 +88,10 @@ namespace CriminisiAlgorithm
                 {
                     Console.WriteLine("image good");
 
-                    Bitmap bitmap = new Bitmap(image);
+                    //Bitmap bitmap = new Bitmap(image);
 
-                    int width = bitmap.Width;
-                    int height = bitmap.Height;
+                    //int width = bitmap.Width;
+                    //int height = bitmap.Height;
 
                     //int blockSize = int.Parse(textBox1.Text);
                     //int stepSize = int.Parse(textBox2.Text);
@@ -72,12 +101,12 @@ namespace CriminisiAlgorithm
                     //int rosHeight = int.Parse(textBox6.Text);
                     //int limit = int.Parse(textBox7.Text);
 
-                    int blockSize = 5;
-                    int stepSize = 5;
-                    int startX = 100;
-                    int startY = 200;
-                    int rosWidth = width / 2;
-                    int rosHeight = height / 2;
+                    int blockSize = 13;
+                    int stepSize = 10;
+                    int startX = 2;
+                    int startY = 2;
+                    int rosWidth = 190;
+                    int rosHeight = 255;
                     int lambda = 0;
                     int threshold = 0;
 
@@ -157,7 +186,7 @@ namespace CriminisiAlgorithm
 
                         if (maxBlock != null)
                         {
-                            diffValues.Add(rosBlock);
+                            diffValues.Add(maxBlock);
                         }
                     }
                 }
@@ -278,9 +307,75 @@ namespace CriminisiAlgorithm
                 }
 
                 pictureBox2.Image = blackImage.ToBitmap();
-
-                Console.WriteLine("!");
+                pictureBox2.SizeMode = PictureBoxSizeMode.Zoom;
             }
+
+            int TruePositive = 0;
+            int TrueNegative = 0;
+            int FalsePositive = 0;
+            int FalseNegative = 0;
+
+            Bitmap bitmap1 = new Bitmap(blackImage.ToBitmap());
+            Bitmap bitmap2 = new Bitmap(originalMask);
+
+            if (bitmap1.Width == bitmap2.Width && bitmap1.Height == bitmap2.Height)
+            {
+                for (int i = 0; i < bitmap1.Width; i++)
+                {
+                    for (int j = 0; j < bitmap1.Height; j++)
+                    {
+                        Color pixel1 = bitmap1.GetPixel(i, j);
+                        Color pixel2 = bitmap2.GetPixel(i, j);
+
+                        // pixel1 == alb(1) si pixel2 == alb(1) -> zona alterata
+                        if (pixel1.ToArgb() == Color.White.ToArgb() && pixel2.ToArgb() == Color.White.ToArgb())
+                        {
+                            TruePositive++;
+                        }
+                        // pixel1 == negru(0) si pixel2 == negru(0) -> zona nealterata
+                        else if (pixel1.ToArgb() == Color.Black.ToArgb() && pixel2.ToArgb() == Color.Black.ToArgb())
+                        {
+                            TrueNegative++;
+                        }
+                        // pixel1 == alb(1) si pixel2 == negru(0)
+                        else if (pixel1.ToArgb() == Color.White.ToArgb() && pixel2.ToArgb() == Color.Black.ToArgb())
+                        {
+                            FalsePositive++;
+                        }
+                        // pixel1 == alb(0) si pixel2 == negru(1)
+                        else if (pixel1.ToArgb() == Color.Black.ToArgb() && pixel2.ToArgb() == Color.White.ToArgb())
+                        {
+                            FalseNegative++;
+                        }
+
+                    }
+                }
+
+                File.AppendAllText(filename, Environment.NewLine);
+
+                Console.WriteLine("TruePositive = " + TruePositive);
+                Console.WriteLine("TrueNegative = " + TrueNegative);
+                Console.WriteLine("FalsePositive = " + FalsePositive);
+                Console.WriteLine("FalseNegative = " + FalseNegative);
+
+                File.AppendAllText(filename, "TruePositive = " + TruePositive + Environment.NewLine);
+                File.AppendAllText(filename, "TrueNegative = " + TrueNegative + Environment.NewLine);
+                File.AppendAllText(filename, "FalsePositive = " + FalsePositive + Environment.NewLine);
+                File.AppendAllText(filename, "FalseNegative = " + FalseNegative + Environment.NewLine);
+            }
+
+            stopWatch.Stop();
+            TimeSpan ts = stopWatch.Elapsed;
+
+            string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                ts.Hours, ts.Minutes, ts.Seconds,
+                ts.Milliseconds / 10);
+            File.AppendAllText(filename, "Time elapsed " + elapsedTime + Environment.NewLine);
+            Console.WriteLine("RunTime " + elapsedTime);
+
+            MessageBox.Show($"done {elapsedTime} ");
+
+            File.AppendAllText(filename, Environment.NewLine);
         }
 
         private bool isRGBChecked = false;
@@ -330,6 +425,18 @@ namespace CriminisiAlgorithm
         private void pictureBox2_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void pictureBox3_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+           
+
+            
         }
     }
 }
