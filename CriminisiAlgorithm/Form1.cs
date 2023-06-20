@@ -93,16 +93,17 @@ namespace CriminisiAlgorithm
                     //int width = bitmap.Width;
                     //int height = bitmap.Height;
 
-                    //int blockSize = int.Parse(textBox1.Text);
-                    //int stepSize = int.Parse(textBox2.Text);
+                    int blockSize = int.Parse(textBox1.Text);
+                    int stepSize = int.Parse(textBox2.Text);
                     //int startX = int.Parse(textBox3.Text);
                     //int startY = int.Parse(textBox4.Text);
                     //int rosWidth = int.Parse(textBox5.Text);
                     //int rosHeight = int.Parse(textBox6.Text);
                     //int limit = int.Parse(textBox7.Text);
+                   
 
-                    int blockSize = 13;
-                    int stepSize = 10;
+                    //int blockSize = 13;
+                    //int stepSize = 10;
                     int startX = 2;
                     int startY = 2;
                     int rosWidth = 190;
@@ -204,16 +205,16 @@ namespace CriminisiAlgorithm
                     //int width = bitmap.Width;
                     //int height = bitmap.Height;
 
-                    //int blockSize = int.Parse(textBox1.Text);
-                    //int stepSize = int.Parse(textBox2.Text);
+                    int blockSize = int.Parse(textBox1.Text);
+                    int stepSize = int.Parse(textBox2.Text);
                     //int startX = int.Parse(textBox3.Text);
                     //int startY = int.Parse(textBox4.Text);
                     //int rosWidth = int.Parse(textBox5.Text);
                     //int rosHeight = int.Parse(textBox6.Text);
                     //int limit = int.Parse(textBox7.Text);
 
-                    int blockSize = 13;
-                    int stepSize = 10;
+                    //int blockSize = 13;
+                    //int stepSize = 10;
                     int startX = 2;
                     int startY = 2;
                     int rosWidth = 190;
@@ -438,5 +439,19 @@ namespace CriminisiAlgorithm
 
             
         }
+
+        public void textBox9_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        public void textBox10_TextChanged(object sender, EventArgs e)
+        {
+            int textBox9Value = int.Parse(textBox9.Text);
+            int textBox10Value = int.Parse(textBox10.Text);
+
+            FuzzyDictionary fuzzyDictionary = new FuzzyDictionary( textBox9Value, textBox10Value);
+        }
     }
+    
 }

@@ -56,7 +56,10 @@
             this.checkBox4 = new System.Windows.Forms.CheckBox();
             this.checkBox3 = new System.Windows.Forms.CheckBox();
             this.button2 = new System.Windows.Forms.Button();
-            this.button4 = new System.Windows.Forms.Button();
+            this.textBox9 = new System.Windows.Forms.TextBox();
+            this.textBox10 = new System.Windows.Forms.TextBox();
+            this.label11 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
@@ -317,15 +320,39 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
-            // button4
+            // textBox9
             // 
-            this.button4.Location = new System.Drawing.Point(1964, 954);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(101, 81);
-            this.button4.TabIndex = 60;
-            this.button4.Text = "Results";
-            this.button4.UseVisualStyleBackColor = true;
-            this.button4.Click += new System.EventHandler(this.button4_Click);
+            this.textBox9.Location = new System.Drawing.Point(1935, 914);
+            this.textBox9.Name = "textBox9";
+            this.textBox9.Size = new System.Drawing.Size(33, 31);
+            this.textBox9.TabIndex = 60;
+            this.textBox9.TextChanged += new System.EventHandler(this.textBox9_TextChanged);
+            // 
+            // textBox10
+            // 
+            this.textBox10.Location = new System.Drawing.Point(1935, 995);
+            this.textBox10.Name = "textBox10";
+            this.textBox10.Size = new System.Drawing.Size(33, 31);
+            this.textBox10.TabIndex = 61;
+            this.textBox10.TextChanged += new System.EventHandler(this.textBox10_TextChanged);
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(1930, 886);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(24, 25);
+            this.label11.TabIndex = 62;
+            this.label11.Text = "a";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(1930, 967);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(24, 25);
+            this.label12.TabIndex = 63;
+            this.label12.Text = "b";
             // 
             // Form1
             // 
@@ -333,7 +360,10 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ClientSize = new System.Drawing.Size(2212, 1091);
-            this.Controls.Add(this.button4);
+            this.Controls.Add(this.label12);
+            this.Controls.Add(this.label11);
+            this.Controls.Add(this.textBox10);
+            this.Controls.Add(this.textBox9);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.radioButton2);
             this.Controls.Add(this.radioButton1);
@@ -403,7 +433,10 @@
         private System.Windows.Forms.CheckBox checkBox4;
         private System.Windows.Forms.CheckBox checkBox3;
         private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.TextBox textBox9;
+        private System.Windows.Forms.TextBox textBox10;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Label label12;
     }
 }
 

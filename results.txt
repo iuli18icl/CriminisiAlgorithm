@@ -30,3 +30,10 @@ FalsePositive = 8947
 FalseNegative = 3662
 Time elapsed 00:00:27.17
 
+
+TruePositive = 7079
+TrueNegative = 66753
+FalsePositive = 13771
+FalseNegative = 2397
+Time elapsed 00:02:06.76
+
