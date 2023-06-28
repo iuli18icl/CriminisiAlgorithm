@@ -78,6 +78,7 @@
             this.pictureBox1.Margin = new System.Windows.Forms.Padding(2);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(294, 293);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
             // 
@@ -149,6 +150,7 @@
             this.textBoxStartHeight.Name = "textBoxStartHeight";
             this.textBoxStartHeight.Size = new System.Drawing.Size(52, 20);
             this.textBoxStartHeight.TabIndex = 50;
+            this.textBoxStartHeight.Text = "100";
             // 
             // textBoxStartWidth
             // 
@@ -157,6 +159,7 @@
             this.textBoxStartWidth.Name = "textBoxStartWidth";
             this.textBoxStartWidth.Size = new System.Drawing.Size(52, 20);
             this.textBoxStartWidth.TabIndex = 49;
+            this.textBoxStartWidth.Text = "100";
             // 
             // textBoxStartY
             // 
@@ -165,6 +168,7 @@
             this.textBoxStartY.Name = "textBoxStartY";
             this.textBoxStartY.Size = new System.Drawing.Size(52, 20);
             this.textBoxStartY.TabIndex = 48;
+            this.textBoxStartY.Text = "0";
             // 
             // textBoxStartX
             // 
@@ -173,6 +177,7 @@
             this.textBoxStartX.Name = "textBoxStartX";
             this.textBoxStartX.Size = new System.Drawing.Size(52, 20);
             this.textBoxStartX.TabIndex = 47;
+            this.textBoxStartX.Text = "0";
             // 
             // textBox2
             // 
@@ -181,6 +186,7 @@
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(52, 20);
             this.textBox2.TabIndex = 46;
+            this.textBox2.Text = "10";
             // 
             // textBox1
             // 
@@ -189,6 +195,7 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(52, 20);
             this.textBox1.TabIndex = 45;
+            this.textBox1.Text = "15";
             this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
             // label7
@@ -312,6 +319,7 @@
             this.textBox9.Name = "textBox9";
             this.textBox9.Size = new System.Drawing.Size(18, 20);
             this.textBox9.TabIndex = 60;
+            this.textBox9.Text = "4";
             this.textBox9.TextChanged += new System.EventHandler(this.textBox9_TextChanged);
             // 
             // textBox10
@@ -321,6 +329,7 @@
             this.textBox10.Name = "textBox10";
             this.textBox10.Size = new System.Drawing.Size(18, 20);
             this.textBox10.TabIndex = 61;
+            this.textBox10.Text = "78";
             this.textBox10.TextChanged += new System.EventHandler(this.textBox10_TextChanged);
             // 
             // label11

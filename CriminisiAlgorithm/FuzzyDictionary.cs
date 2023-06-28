@@ -11,18 +11,15 @@ namespace CriminisiAlgorithm
         public Dictionary<int, double> fuzzyMembershipComputed;
         //public readonly int a = 4;
         //public readonly int b = 78;
-        public int a { get; set; }
-        public int b { get; set; }
-        public FuzzyDictionary (int textBox9Value, int textBox10Value)
-        {
-            int a = textBox9Value;
-            int b = textBox10Value;
-        }
+        public int a { get; private set; }
+        public int b { get; private set; }
+
 
         public int BlockSize { get; set; }
 
-        public FuzzyDictionary(int blockSize)
+        public FuzzyDictionary(int blockSize, int _a, int _b)
         {
+            a = _a; b = _b;
             this.BlockSize = blockSize;
         }
     }

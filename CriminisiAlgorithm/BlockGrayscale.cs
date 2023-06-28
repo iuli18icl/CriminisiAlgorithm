@@ -18,6 +18,10 @@ namespace CriminisiAlgorithm
 
         public byte[,] Pixels { get; set; }
 
+        public int MatchingDegree { get; set; }
+        public IBlock Source { get; set; }
+        public IBlock TamperedBlock { get; set; }
+
         public BlockGrayscale(Point topLeft, Size size, byte[,] Pixels)
         {
             TopLeft = topLeft;

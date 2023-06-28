@@ -15,5 +15,8 @@ namespace CriminisiAlgorithm
         int Y { get; }
         int Width { get; }
         int Height { get; }
+
+        IBlock Source { get; set; }
+        IBlock TamperedBlock { get; set; }
     }
 }

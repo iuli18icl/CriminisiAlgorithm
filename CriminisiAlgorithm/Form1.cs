@@ -31,9 +31,8 @@ namespace CriminisiAlgorithm
                 image = Image.FromFile(selectedFile);
 
                 pictureBox.Image = image;
-                blackImage = new Image<Bgr, byte>(image.Width, image.Height, new Bgr(0, 0, 0));
-
-                pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
+                
+                
             }
         }
 
@@ -60,6 +59,7 @@ namespace CriminisiAlgorithm
 
             AutoSize = true;
             AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            rbtRGB.Checked = true;
         }
 
 
@@ -75,6 +75,7 @@ namespace CriminisiAlgorithm
 
         private void Compute_Click(object sender, EventArgs e)
         {
+            blackImage = new Image<Bgr, byte>(image.Width, image.Height, new Bgr(0, 0, 0));
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
             ComponentCalculator calculator = new ComponentCalculator();
@@ -91,6 +92,10 @@ namespace CriminisiAlgorithm
             int blockSize = int.Parse(textBox1.Text);
             int stepSize = int.Parse(textBox2.Text);
 
+            int a = int.Parse(textBox9.Text);
+            int b = int.Parse(textBox10.Text);
+
+            var fuzzyDict = FuzzyCompute.ComputeFuzzyMembership(blockSize, a, b);
             isRGBChecked = rbtRGB.Checked;
             isGrayscaleChecked = rbtGrayscale.Checked;
             ///////////// RGB /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -110,8 +115,6 @@ namespace CriminisiAlgorithm
                     imgBlocks.DivideRGBImageIntoBlocks(pictureBox1.Image, blockSize, stepSize);
                     List<IBlock> imageBlocks = imgBlocks.Blocks;
 
-                    FuzzyCompute.SetBlockSize(blockSize);
-                    var fuzzyDict = FuzzyCompute.ComputeFuzzyMembership();
                     Parallel.ForEach(rosBlocks,  item =>
                     {
                         BlockRGB rosBlock = (BlockRGB)item;
@@ -154,12 +157,16 @@ namespace CriminisiAlgorithm
                                 }
 
                                 BlockGrayscale differenceBlock = new BlockGrayscale(new Point(rosBlock.X, rosBlock.Y), new Size(blockSize, blockSize), diffPixels);
+                                differenceBlock.TamperedBlock = rosBlock;
+                                differenceBlock.Source = imageBlock;
+
                                 var x = calculator.GetMatchingDegree(diffPixels);
                                 if (x != -1)
                                 {
                                     var fuzzyValue = fuzzyDict.fuzzyMembershipComputed[x];
                                     if (fuzzyValue > maxFuzzy && fuzzyValue >= threshold)
                                     {
+                                        differenceBlock.MatchingDegree = x;
                                         maxFuzzy = fuzzyValue;
                                         maxBlock = differenceBlock;
                                     }
@@ -190,14 +197,11 @@ namespace CriminisiAlgorithm
                     imgBlocks.DivideGrayscaleImageIntoBlocks(pictureBox1.Image, blockSize, stepSize);
                     List<IBlock> imageBlocks = imgBlocks.Blocks;
 
-                    FuzzyCompute.SetBlockSize(blockSize);
-                    var fuzzyDict = FuzzyCompute.ComputeFuzzyMembership();
-
-                    foreach (BlockGrayscale rosBlock in rosBlocks)
+                    Parallel.ForEach(rosBlocks, item =>
                     {
+                        BlockGrayscale rosBlock = (BlockGrayscale)item;
                         double maxFuzzy = int.MinValue;
                         BlockGrayscale maxBlock = null;
-
 
                         foreach (BlockGrayscale imageBlock in imageBlocks)
                         {
@@ -219,8 +223,11 @@ namespace CriminisiAlgorithm
                                 }
 
                                 BlockGrayscale differenceBlock = new BlockGrayscale(new Point(rosBlock.X, rosBlock.Y), new Size(blockSize, blockSize), diffPixels);
+                                differenceBlock.TamperedBlock = rosBlock;
+                                differenceBlock.Source = imageBlock;
+
                                 var x = calculator.GetMatchingDegree(diffPixels);
-                                if(x != -1)
+                                if (x != -1)
                                 {
                                     var fuzzyValue = fuzzyDict.fuzzyMembershipComputed[x];
                                     if (fuzzyValue > maxFuzzy && x >= threshold)
@@ -230,13 +237,13 @@ namespace CriminisiAlgorithm
                                     }
                                 }
                             }
-                        }
 
-                        if (maxBlock != null)
-                        {
-                            diffValues.Add(maxBlock);
+                            if (maxBlock != null)
+                            {
+                                diffValues.Add(maxBlock);
+                            }
                         }
-                    }
+                    });
                 }
             }
 
@@ -267,6 +274,7 @@ namespace CriminisiAlgorithm
 
                 pictureBox2.Image = blackImage.ToBitmap();
                 pictureBox2.SizeMode = PictureBoxSizeMode.Zoom;
+                pictureBox2.Refresh();
             }
 
             int TruePositive = 0;
@@ -331,8 +339,8 @@ namespace CriminisiAlgorithm
                 ts.Milliseconds / 10);
             File.AppendAllText(filename, "Time elapsed " + elapsedTime + Environment.NewLine);
             Console.WriteLine("RunTime " + elapsedTime);
-
-            MessageBox.Show($"done {elapsedTime} ");
+            
+            MessageBox.Show($"done {elapsedTime} " + diffValues.Count);
 
             File.AppendAllText(filename, Environment.NewLine);
         }
@@ -407,8 +415,6 @@ namespace CriminisiAlgorithm
         {
             int textBox9Value = int.Parse(textBox9.Text);
             int textBox10Value = int.Parse(textBox10.Text);
-
-            FuzzyDictionary fuzzyDictionary = new FuzzyDictionary( textBox9Value, textBox10Value);
         }
 
         private void radioButton2_CheckedChanged(object sender, EventArgs e)

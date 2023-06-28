@@ -20,6 +20,8 @@ namespace CriminisiAlgorithm
         public byte[,] RedPixels { get; set; }
         public byte[,] GreenPixels { get; set; }
         public byte[,] BluePixels { get; set; }
+        public IBlock Source { get; set; }
+        public IBlock TamperedBlock { get; set; }
 
         public BlockRGB(Point topLeft, Size size, byte[,] RedPixels, byte[,] GreenPixels, byte[,] BluePixels)
         {

@@ -8,15 +8,9 @@ namespace CriminisiAlgorithm
 {
     internal class FuzzyCompute
     {
-        public static int blockSize { get; set; }
-        public static void SetBlockSize(int size)
+        public static FuzzyDictionary ComputeFuzzyMembership(int blockSize, int a, int b)
         {
-            blockSize = size;
-        }
-
-        public static FuzzyDictionary ComputeFuzzyMembership()
-        {
-            FuzzyDictionary fuzzyDictionary = new FuzzyDictionary(blockSize)
+            FuzzyDictionary fuzzyDictionary = new FuzzyDictionary(blockSize, a,b)
             {
                 fuzzyMembershipComputed = new Dictionary<int, double>()
             };
