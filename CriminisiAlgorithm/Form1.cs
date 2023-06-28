@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace CriminisiAlgorithm
 {
@@ -15,7 +16,7 @@ namespace CriminisiAlgorithm
         Image<Bgr, byte> blackImage;
         Image originalMask;
 
-        string filename = @"\\Mac\Home\Desktop\Licenta\CriminisiAlgorithm\results.txt";
+        string filename = @"results.txt";
 
         // load image in picture box and store the image
         public void LoadImageFromFile(PictureBox pictureBox)
@@ -76,10 +77,23 @@ namespace CriminisiAlgorithm
         {
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
+            ComponentCalculator calculator = new ComponentCalculator();
 
             List<IBlock> diffValues = new List<IBlock>();
 
-        ///////////// RGB /////////////////////////////////////////////////////////////////////////////////////////////////////////
+            int startX = int.Parse(textBoxStartX.Text);
+            int startY = int.Parse(textBoxStartY.Text);
+            int rosWidth = int.Parse(textBoxStartWidth.Text);
+            int rosHeight = int.Parse(textBoxStartHeight.Text);
+            int lambda = int.Parse(textBoxLambda.Text);
+            float threshold = float.Parse(textBoxThreshold.Text); 
+
+            int blockSize = int.Parse(textBox1.Text);
+            int stepSize = int.Parse(textBox2.Text);
+
+            isRGBChecked = rbtRGB.Checked;
+            isGrayscaleChecked = rbtGrayscale.Checked;
+            ///////////// RGB /////////////////////////////////////////////////////////////////////////////////////////////////////////
             if (isRGBChecked)
             {
                 Console.WriteLine("rgb checked");
@@ -87,34 +101,6 @@ namespace CriminisiAlgorithm
                 if (image != null)
                 {
                     Console.WriteLine("image good");
-
-                    //Bitmap bitmap = new Bitmap(image);
-
-                    //int width = bitmap.Width;
-                    //int height = bitmap.Height;
-
-                    int blockSize = int.Parse(textBox1.Text);
-                    int stepSize = int.Parse(textBox2.Text);
-                    //int startX = int.Parse(textBox3.Text);
-                    //int startY = int.Parse(textBox4.Text);
-                    //int rosWidth = int.Parse(textBox5.Text);
-                    //int rosHeight = int.Parse(textBox6.Text);
-                    //int limit = int.Parse(textBox7.Text);
-                   
-
-                    //int blockSize = 13;
-                    //int stepSize = 10;
-                    int startX = 2;
-                    int startY = 2;
-                    int rosWidth = 190;
-                    int rosHeight = 255;
-                    int lambda = 0;
-                    int threshold = 0;
-
-                    //Rectangle first = new Rectangle(1, 1, 5, 5);
-                    //Rectangle second = new Rectangle(4, 7, 3, 3);
-                    //bool rez = Utils.CheckOverlap(first, second);
-                    //Console.WriteLine(rez);
 
                     Ros ros = new Ros();
                     ros.LoadRGBBlocks(pictureBox1.Image, blockSize, new Point(startX, startY), new Size(rosWidth, rosHeight), stepSize);
@@ -126,11 +112,9 @@ namespace CriminisiAlgorithm
 
                     FuzzyCompute.SetBlockSize(blockSize);
                     var fuzzyDict = FuzzyCompute.ComputeFuzzyMembership();
-
-                    List<byte[,]> finalDiffValues = new List<byte[,]>();
-
-                    foreach (BlockRGB rosBlock in rosBlocks)
+                    Parallel.ForEach(rosBlocks,  item =>
                     {
+                        BlockRGB rosBlock = (BlockRGB)item;
                         double maxFuzzy = int.MinValue;
                         BlockGrayscale maxBlock = null;
 
@@ -169,8 +153,6 @@ namespace CriminisiAlgorithm
                                     }
                                 }
 
-                                ComponentCalculator calculator = new ComponentCalculator();
-
                                 BlockGrayscale differenceBlock = new BlockGrayscale(new Point(rosBlock.X, rosBlock.Y), new Size(blockSize, blockSize), diffPixels);
                                 var x = calculator.GetMatchingDegree(diffPixels);
                                 if (x != -1)
@@ -189,7 +171,7 @@ namespace CriminisiAlgorithm
                         {
                             diffValues.Add(maxBlock);
                         }
-                    }
+                    });
                 }
             }
             else if (isGrayscaleChecked)
@@ -199,28 +181,6 @@ namespace CriminisiAlgorithm
                 if (image != null)
                 {
                     Console.WriteLine("image good");
-
-                    //Bitmap bitmap = new Bitmap(image);
-
-                    //int width = bitmap.Width;
-                    //int height = bitmap.Height;
-
-                    int blockSize = int.Parse(textBox1.Text);
-                    int stepSize = int.Parse(textBox2.Text);
-                    //int startX = int.Parse(textBox3.Text);
-                    //int startY = int.Parse(textBox4.Text);
-                    //int rosWidth = int.Parse(textBox5.Text);
-                    //int rosHeight = int.Parse(textBox6.Text);
-                    //int limit = int.Parse(textBox7.Text);
-
-                    //int blockSize = 13;
-                    //int stepSize = 10;
-                    int startX = 2;
-                    int startY = 2;
-                    int rosWidth = 190;
-                    int rosHeight = 255;
-                    int lambda = 0;
-                    int threshold = 0;
 
                     Ros ros = new Ros();
                     ros.LoadGrayscaleBlocks(pictureBox1.Image, blockSize, new Point(startX, startY), new Size(rosWidth, rosHeight), stepSize);
@@ -258,8 +218,6 @@ namespace CriminisiAlgorithm
                                     }
                                 }
 
-                                ComponentCalculator calculator = new ComponentCalculator();
-                                
                                 BlockGrayscale differenceBlock = new BlockGrayscale(new Point(rosBlock.X, rosBlock.Y), new Size(blockSize, blockSize), diffPixels);
                                 var x = calculator.GetMatchingDegree(diffPixels);
                                 if(x != -1)
@@ -383,21 +341,21 @@ namespace CriminisiAlgorithm
 
         private void radioButton1_CheckedChanged(object sender, EventArgs e)
         {
-            isRGBChecked = radioButton1.Checked;
+            isRGBChecked = rbtRGB.Checked;
         }
 
         private bool isGrayscaleChecked = false;
         private void radioButton2_CheckedChanged_1(object sender, EventArgs e)
         {
-            isGrayscaleChecked = radioButton2.Checked;
+            isGrayscaleChecked = rbtGrayscale.Checked;
         }
 
         private bool isANDChecked = false;
         private void checkBox3_CheckedChanged(object sender, EventArgs e)
         {
-            if (radioButton1.Checked)
+            if (rbtRGB.Checked)
             {
-                isANDChecked = checkBox3.Checked;
+                isANDChecked = rbtAnd.Checked ;
             }
             else
             {
@@ -408,9 +366,9 @@ namespace CriminisiAlgorithm
         private bool isORChecked = false;
         private void checkBox4_CheckedChanged(object sender, EventArgs e)
         {
-            if (radioButton1.Checked)
+            if (rbtRGB.Checked)
             {
-                isORChecked = checkBox4.Checked;
+                isORChecked = rbtOr.Checked;
             }
             else
             {
@@ -451,6 +409,24 @@ namespace CriminisiAlgorithm
             int textBox10Value = int.Parse(textBox10.Text);
 
             FuzzyDictionary fuzzyDictionary = new FuzzyDictionary( textBox9Value, textBox10Value);
+        }
+
+        private void radioButton2_CheckedChanged(object sender, EventArgs e)
+        {
+            groupBoxAndOr.Enabled = false;
+            rbtAnd.Checked = false;
+            rbtOr.Checked = false;
+        }
+
+        private void radioButton1_CheckedChanged_1(object sender, EventArgs e)
+        {
+            //
+            if (rbtRGB.Checked)
+            {
+                groupBoxAndOr.Enabled = true;
+                rbtAnd.Checked = true;
+                rbtOr.Checked = false;
+            }
         }
     }
     
