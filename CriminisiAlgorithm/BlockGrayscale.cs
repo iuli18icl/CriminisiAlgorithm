@@ -27,7 +27,7 @@ namespace CriminisiAlgorithm
         }
 
         public void SetPixels(byte[,] Pixels)
-        {
+        { 
             this.Pixels = Pixels;
         }
     }

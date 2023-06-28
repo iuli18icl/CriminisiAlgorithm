@@ -265,7 +265,7 @@ namespace CriminisiAlgorithm
                                 if(x != -1)
                                 {
                                     var fuzzyValue = fuzzyDict.fuzzyMembershipComputed[x];
-                                    if (fuzzyValue > maxFuzzy && fuzzyValue >= threshold)
+                                    if (fuzzyValue > maxFuzzy && x >= threshold)
                                     {
                                         maxFuzzy = fuzzyValue;
                                         maxBlock = imageBlock;
