@@ -34,11 +34,11 @@ namespace CriminisiAlgorithm
 
         public static Bitmap CopyDataToBitmap(byte[,] data, int height, int width)
         {
-            Bitmap bmp = new Bitmap(width, height); 
+            Bitmap bmp = new Bitmap(height, width); 
 
-            for (int i = 0; i < width; i++)
+            for (int i = 0; i < height; i++)
             {
-                for (int j = 0; j < height; j++)
+                for (int j = 0; j < width; j++)
                 {
                     bmp.SetPixel(i, j, data[i, j] == 0 ? Color.Black : Color.White);
                 }

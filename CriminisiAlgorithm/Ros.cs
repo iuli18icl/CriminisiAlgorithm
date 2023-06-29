@@ -23,15 +23,16 @@ namespace CriminisiAlgorithm
 
             List <IBlock> blocks = new List<IBlock>();
 
-            int width = imageStructure.GetLength(1);
-            int height = imageStructure.GetLength(0);
+            int width = imageStructure.GetLength(0);
+            int height = imageStructure.GetLength(1);
 
             // ne asiguram ca regiune data se gaseste in limitele imaginii
-            Size.Width = Math.Min(Size.Width, width - TopLeft.X);
-            Size.Height = Math.Min(Size.Height, height - TopLeft.Y);
+            Size.Height = Math.Min(Size.Height, height - TopLeft.X);
+            Size.Width = Math.Min(Size.Width, width - TopLeft.Y);
 
-            int endX = TopLeft.X + Size.Width;
-            int endY = TopLeft.Y + Size.Height;
+
+            int endX = TopLeft.X + Size.Height;
+            int endY = TopLeft.Y + Size.Width;
 
             for (int i = TopLeft.X; i <= endX - blockSize; i += stepSize)
             {
@@ -67,15 +68,16 @@ namespace CriminisiAlgorithm
 
             List<IBlock> blocks = new List<IBlock>();
 
-            int width = imageStructure.GetLength(1);
-            int height = imageStructure.GetLength(0);
+            int width = imageStructure.GetLength(0);
+            int height = imageStructure.GetLength(1);
 
             // Make sure the given region is within the image boundaries
-            Size.Width = Math.Min(Size.Width, width - TopLeft.X);
-            Size.Height = Math.Min(Size.Height, height - TopLeft.Y);
+            Size.Height = Math.Min(Size.Height, height - TopLeft.X);
+            Size.Width = Math.Min(Size.Width, width - TopLeft.Y);
 
-            int endX = TopLeft.X + Size.Width;
-            int endY = TopLeft.Y + Size.Height;
+
+            int endX = TopLeft.X + Size.Height;
+            int endY = TopLeft.Y + Size.Width;
 
             for (int i = TopLeft.X; i <= endX - blockSize; i += stepSize)
             {

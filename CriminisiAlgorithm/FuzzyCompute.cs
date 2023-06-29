@@ -10,7 +10,7 @@ namespace CriminisiAlgorithm
     {
         public static FuzzyDictionary ComputeFuzzyMembership(int blockSize, int a, int b)
         {
-            FuzzyDictionary fuzzyDictionary = new FuzzyDictionary(blockSize, a,b)
+            FuzzyDictionary fuzzyDictionary = new FuzzyDictionary(blockSize, a, b)
             {
                 fuzzyMembershipComputed = new Dictionary<int, double>()
             };

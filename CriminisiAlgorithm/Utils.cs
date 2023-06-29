@@ -19,9 +19,9 @@ namespace CriminisiAlgorithm
 
             byte[,,] imageArray = new byte[width, height, 3];
 
-            for (int i = 0; i < width; i++)
+            for (int i = 0; i < height; i++)
             {
-                for (int j = 0; j < height; j++)
+                for (int j = 0; j < width; j++)
                 {
                     Color pixelColor = bitmap.GetPixel(i, j);
                     imageArray[i, j, 0] = pixelColor.R;
@@ -42,9 +42,9 @@ namespace CriminisiAlgorithm
 
             byte[,] grayscaleArray = new byte[width, height];
 
-            for (int x = 0; x < width; x++)
+            for (int x = 0; x < height; x++)
             {
-                for (int y = 0; y < height; y++)
+                for (int y = 0; y < width; y++)
                 {
                     Color pixelColor = bitmap.GetPixel(x, y);
                     byte grayscaleValue = (byte)((pixelColor.R + pixelColor.G + pixelColor.B) / 3);
@@ -58,7 +58,7 @@ namespace CriminisiAlgorithm
         // functie pt a transforma din <byte[,]> in <rectangle>
         public static Rectangle BlockToRectangle(IBlock block)
         {
-            return new Rectangle(block.X, block.Y, block.Width, block.Height);
+            return new Rectangle(block.X, block.Y, block.Height, block.Width);
         }
 
         // functii pt overlapping

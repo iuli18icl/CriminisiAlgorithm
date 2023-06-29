@@ -232,8 +232,9 @@ namespace CriminisiAlgorithm
                                     var fuzzyValue = fuzzyDict.fuzzyMembershipComputed[x];
                                     if (fuzzyValue > maxFuzzy && x >= threshold)
                                     {
+                                        differenceBlock.MatchingDegree = x;
                                         maxFuzzy = fuzzyValue;
-                                        maxBlock = imageBlock;
+                                        maxBlock = differenceBlock;                                     
                                     }
                                 }
                             }
@@ -252,8 +253,8 @@ namespace CriminisiAlgorithm
             foreach (IBlock diffValue in diffValues)
             {
                 // Define the rectangle
-                int rectX = diffValue.X; 
-                int rectY = diffValue.Y; 
+                int rectX = diffValue.X;
+                int rectY = diffValue.Y;
                 int rectWidth = diffValue.Width; 
                 int rectHeight = diffValue.Height;
 
@@ -337,7 +338,8 @@ namespace CriminisiAlgorithm
             string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
                 ts.Hours, ts.Minutes, ts.Seconds,
                 ts.Milliseconds / 10);
-            File.AppendAllText(filename, "Time elapsed " + elapsedTime + Environment.NewLine);
+            File.AppendAllText(filename, "Time elapsed: " + elapsedTime + Environment.NewLine);
+            File.AppendAllText(filename, "Number of best match matrixes: " + diffValues.Count + Environment.NewLine);
             Console.WriteLine("RunTime " + elapsedTime);
             
             MessageBox.Show($"done {elapsedTime} " + diffValues.Count);
@@ -413,8 +415,8 @@ namespace CriminisiAlgorithm
 
         public void textBox10_TextChanged(object sender, EventArgs e)
         {
-            int textBox9Value = int.Parse(textBox9.Text);
-            int textBox10Value = int.Parse(textBox10.Text);
+           // int textBox9Value = int.Parse(textBox9.Text);
+           // int textBox10Value = int.Parse(textBox10.Text);
         }
 
         private void radioButton2_CheckedChanged(object sender, EventArgs e)
