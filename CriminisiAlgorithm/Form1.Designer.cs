@@ -66,12 +66,16 @@
             this.lblTrueNegative = new System.Windows.Forms.Label();
             this.lblFalsePositive = new System.Windows.Forms.Label();
             this.lblTruePositive = new System.Windows.Forms.Label();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.rbtOnlyWhiteRos = new System.Windows.Forms.RadioButton();
+            this.rbtRosWithReferenceWithColor = new System.Windows.Forms.RadioButton();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBoxAndOr.SuspendLayout();
             this.gbResults.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // pictureBox1
@@ -455,12 +459,47 @@
             this.lblTruePositive.TabIndex = 67;
             this.lblTruePositive.Text = "TruePositive";
             // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.rbtRosWithReferenceWithColor);
+            this.groupBox2.Controls.Add(this.rbtOnlyWhiteRos);
+            this.groupBox2.Location = new System.Drawing.Point(595, 312);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(200, 100);
+            this.groupBox2.TabIndex = 69;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Vizualizare";
+            // 
+            // rbtOnlyWhiteRos
+            // 
+            this.rbtOnlyWhiteRos.AutoSize = true;
+            this.rbtOnlyWhiteRos.Location = new System.Drawing.Point(21, 19);
+            this.rbtOnlyWhiteRos.Name = "rbtOnlyWhiteRos";
+            this.rbtOnlyWhiteRos.Size = new System.Drawing.Size(137, 17);
+            this.rbtOnlyWhiteRos.TabIndex = 0;
+            this.rbtOnlyWhiteRos.TabStop = true;
+            this.rbtOnlyWhiteRos.Text = "Doar block din ROS alb";
+            this.rbtOnlyWhiteRos.UseVisualStyleBackColor = true;
+            // 
+            // rbtRosWithReferenceWithColor
+            // 
+            this.rbtRosWithReferenceWithColor.AutoSize = true;
+            this.rbtRosWithReferenceWithColor.Checked = true;
+            this.rbtRosWithReferenceWithColor.Location = new System.Drawing.Point(20, 42);
+            this.rbtRosWithReferenceWithColor.Name = "rbtRosWithReferenceWithColor";
+            this.rbtRosWithReferenceWithColor.Size = new System.Drawing.Size(183, 17);
+            this.rbtRosWithReferenceWithColor.TabIndex = 1;
+            this.rbtRosWithReferenceWithColor.TabStop = true;
+            this.rbtRosWithReferenceWithColor.Text = "Block din ROS + referinta colorat ";
+            this.rbtRosWithReferenceWithColor.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ClientSize = new System.Drawing.Size(1106, 552);
+            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.gbResults);
             this.Controls.Add(this.groupBoxAndOr);
             this.Controls.Add(this.groupBox1);
@@ -503,6 +542,8 @@
             this.groupBoxAndOr.PerformLayout();
             this.gbResults.ResumeLayout(false);
             this.gbResults.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -548,6 +589,9 @@
         private System.Windows.Forms.Label lblTrueNegative;
         private System.Windows.Forms.Label lblFalsePositive;
         private System.Windows.Forms.Label lblTruePositive;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.RadioButton rbtRosWithReferenceWithColor;
+        private System.Windows.Forms.RadioButton rbtOnlyWhiteRos;
     }
 }
 

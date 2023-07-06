@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Rebar;
 using System.Windows;
 using System.Linq;
+using System.Text;
 
 namespace CriminisiAlgorithm
 {
@@ -35,7 +36,7 @@ namespace CriminisiAlgorithm
                 pictureBox.Image = image;
             }
         }
-        
+
         // Load Original Mask
         private void button2_Click(object sender, EventArgs e)
         {
@@ -81,10 +82,10 @@ namespace CriminisiAlgorithm
             lblFalsePositive.Text = "";
         }
 
-        private static byte ComputeOr(byte value1,byte value2, byte value3)
+        private static byte ComputeOr(byte value1, byte value2, byte value3)
         {
             var s = value1 + value2 + value3;
-            if(s != 0)
+            if (s != 0)
             {
                 return 1;
             }
@@ -93,7 +94,7 @@ namespace CriminisiAlgorithm
 
         private static byte ComputeAnd(byte value1, byte value2, byte value3)
         {
-            if(value1!= 0 && value2 != 0 && value3 != 0)
+            if (value1 != 0 && value2 != 0 && value3 != 0)
             {
                 return 1;
             }
@@ -103,6 +104,7 @@ namespace CriminisiAlgorithm
         private void Compute_Click(object sender, EventArgs e)
         {
             InitLabelResults();
+            StringBuilder s = new StringBuilder();
             blackImage = new Image<Bgr, byte>(image.Width, image.Height, new Bgr(0, 0, 0));
             var blackImageToComputeRate = new Image<Bgr, byte>(image.Width, image.Height, new Bgr(0, 0, 0));
             Stopwatch stopWatch = new Stopwatch();
@@ -180,8 +182,8 @@ namespace CriminisiAlgorithm
                                         else diffBluePixels[i, j] = 0;
 
                                         diffPixels[i, j] = (isANDChecked == true)
-                                            ? ComputeAnd(diffRedPixels[i, j] , diffGreenPixels[i, j] , diffBluePixels[i, j])
-                                            : ComputeOr(diffRedPixels[i, j] , diffGreenPixels[i, j] , diffBluePixels[i, j]);
+                                            ? ComputeAnd(diffRedPixels[i, j], diffGreenPixels[i, j], diffBluePixels[i, j])
+                                            : ComputeOr(diffRedPixels[i, j], diffGreenPixels[i, j], diffBluePixels[i, j]);
                                     }
                                 }
 
@@ -281,7 +283,7 @@ namespace CriminisiAlgorithm
 
             foreach (IBlock diffValue in diffValues.Where(aw => aw != null))
             {
-                if(diffValue == null)
+                if (diffValue == null)
                 {
                     continue;
                 }
@@ -302,19 +304,29 @@ namespace CriminisiAlgorithm
                     {
                         //Console.WriteLine(String.Format("i: {0}, j: {1}, limits i: {2}, limits j: {3}", i, j, rectX + rectWidth, rectY + rectHeight));
                         // Set the pixel color
-                        blackImage[j, i] = color;
+                        if (rbtRosWithReferenceWithColor.Checked)
+                        {
+                            blackImage[j, i] = color;
+                        }
+                        else
+                        {
+                            blackImage[j, i] = whiteColor;
+                        }
+                        
                         blackImageToComputeRate[j, i] = whiteColor;
                     }
                 }
 
-                
-                for (int i = 0; i < rectWidth; i++)
+                if (rbtRosWithReferenceWithColor.Checked)
                 {
-                    for (int j = 0; j < rectHeight; j++)
+                    for (int i = 0; i < rectWidth; i++)
                     {
-                        //Console.WriteLine(String.Format("i: {0}, j: {1}, limits i: {2}, limits j: {3}", i, j, rectX + rectWidth, rectY + rectHeight));
-                        // Set the pixel color
-                        blackImage[j + diffValue.Source.TopLeft.Y, i + diffValue.Source.TopLeft.X] = color;
+                        for (int j = 0; j < rectHeight; j++)
+                        {
+                            //Console.WriteLine(String.Format("i: {0}, j: {1}, limits i: {2}, limits j: {3}", i, j, rectX + rectWidth, rectY + rectHeight));
+                            // Set the pixel color
+                            blackImage[j + diffValue.Source.TopLeft.Y, i + diffValue.Source.TopLeft.X] = color;
+                        }
                     }
                 }
             }
@@ -373,7 +385,7 @@ namespace CriminisiAlgorithm
                 }
 
                 File.AppendAllText(filename, Environment.NewLine);
-                lblTruePositive.Text = "TP="+ TruePositive.ToString();
+                lblTruePositive.Text = "TP=" + TruePositive.ToString();
                 lblTrueNegative.Text = "TN=" + TrueNegative.ToString();
                 lblFalsePositive.Text = "FP=" + FalsePositive.ToString();
                 lblFalseNegative.Text = "FN=" + FalseNegative.ToString();
@@ -383,10 +395,16 @@ namespace CriminisiAlgorithm
                 Console.WriteLine("FalsePositive = " + FalsePositive);
                 Console.WriteLine("FalseNegative = " + FalseNegative);
 
-                File.AppendAllText(filename, "TruePositive = " + TruePositive + Environment.NewLine);
-                File.AppendAllText(filename, "TrueNegative = " + TrueNegative + Environment.NewLine);
-                File.AppendAllText(filename, "FalsePositive = " + FalsePositive + Environment.NewLine);
-                File.AppendAllText(filename, "FalseNegative = " + FalseNegative + Environment.NewLine);
+                s.Append(TruePositive + ";");
+                s.Append(TrueNegative + ";");
+                s.Append(FalsePositive + ";");
+                s.Append(FalseNegative + ";");
+                s.Append(blockSize.ToString() + ";");
+                s.Append(stepSize.ToString() + ";");
+                s.Append(threshold.ToString() + ";");
+                s.Append((isRGBChecked ? "RGB" : "Gray") + ";");
+                s.Append(a.ToString() + ";");
+                s.Append(b.ToString() + ";");
             }
 
             stopWatch.Stop();
@@ -395,13 +413,12 @@ namespace CriminisiAlgorithm
             string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
                 ts.Hours, ts.Minutes, ts.Seconds,
                 ts.Milliseconds / 10);
-            File.AppendAllText(filename, "Time elapsed: " + elapsedTime + Environment.NewLine);
-            File.AppendAllText(filename, "Number of best match matrixes: " + diffValues.Count + Environment.NewLine);
-            Console.WriteLine("RunTime " + elapsedTime);
+            s.Append(elapsedTime + ";");
+            s.Append(diffValues.Count + ";");
 
             MessageBox.Show($"done {elapsedTime} " + diffValues.Count);
+            File.AppendAllText(filename, s.ToString());
 
-            File.AppendAllText(filename, Environment.NewLine);
         }
 
         private bool isRGBChecked = false;
