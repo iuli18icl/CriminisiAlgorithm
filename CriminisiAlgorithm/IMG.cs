@@ -30,9 +30,9 @@ namespace CriminisiAlgorithm
 
             List<IBlock> blocks = new List<IBlock>();
 
-            for (int i = 0; i <= height - BlockSize; i += Step)
+            for (int i = 0; i <= width - BlockSize; i += Step)
             {
-                for (int j = 0; j <= width  - BlockSize; j += Step)
+                for (int j = 0; j <= height - BlockSize; j += Step)
                 {
                     byte[,] blockR = new byte[BlockSize, BlockSize];
                     byte[,] blockG = new byte[BlockSize, BlockSize];
@@ -68,9 +68,9 @@ namespace CriminisiAlgorithm
 
             List<IBlock> blocks = new List<IBlock>();
 
-            for (int i = 0; i <= height - blockSize; i += step)
+            for (int i = 0; i <= width - blockSize; i += step)
             {
-                for (int j = 0; j <= width - blockSize; j += step)
+                for (int j = 0; j <= height - blockSize; j += step)
                 {
                     byte[,] blockPixels = new byte[blockSize, blockSize];
 
