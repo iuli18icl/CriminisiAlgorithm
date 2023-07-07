@@ -7,6 +7,10 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Rebar;
+using System.Windows;
+using System.Linq;
+using System.Text;
 
 namespace CriminisiAlgorithm
 {
@@ -15,7 +19,7 @@ namespace CriminisiAlgorithm
         Image image;
         Image<Bgr, byte> blackImage;
         Image originalMask;
-
+        string originalMaskFilename;
         string filename = @"results.txt";
 
         // load image in picture box and store the image
@@ -29,10 +33,7 @@ namespace CriminisiAlgorithm
             {
                 string selectedFile = openFileDialog.FileName;
                 image = Image.FromFile(selectedFile);
-
                 pictureBox.Image = image;
-                
-                
             }
         }
 
@@ -47,7 +48,7 @@ namespace CriminisiAlgorithm
             {
                 string selectedFile = openFileDialog.FileName;
                 originalMask = Image.FromFile(selectedFile);
-
+                originalMaskFilename = selectedFile;
                 pictureBox3.Image = originalMask;
                 pictureBox3.SizeMode = PictureBoxSizeMode.Zoom;
             }
@@ -57,15 +58,15 @@ namespace CriminisiAlgorithm
         {
             InitializeComponent();
 
-            AutoSize = true;
-            AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            //AutoSize = true;
+            //AutoSizeMode = AutoSizeMode.GrowAndShrink;
             rbtRGB.Checked = true;
         }
 
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
+            InitLabelResults();
         }
 
         private void LoadImage_Click(object sender, EventArgs e)
@@ -73,9 +74,39 @@ namespace CriminisiAlgorithm
             LoadImageFromFile(pictureBox1);
         }
 
+        private void InitLabelResults()
+        {
+            lblTrueNegative.Text = "";
+            lblTruePositive.Text = "";
+            lblFalseNegative.Text = "";
+            lblFalsePositive.Text = "";
+        }
+
+        private static byte ComputeOr(byte value1, byte value2, byte value3)
+        {
+            var s = value1 + value2 + value3;
+            if (s != 0)
+            {
+                return 1;
+            }
+            return 0;
+        }
+
+        private static byte ComputeAnd(byte value1, byte value2, byte value3)
+        {
+            if (value1 != 0 && value2 != 0 && value3 != 0)
+            {
+                return 1;
+            }
+            return 0;
+        }
+
         private void Compute_Click(object sender, EventArgs e)
         {
+            InitLabelResults();
+            StringBuilder s = new StringBuilder();
             blackImage = new Image<Bgr, byte>(image.Width, image.Height, new Bgr(0, 0, 0));
+            var blackImageToComputeRate = new Image<Bgr, byte>(image.Width, image.Height, new Bgr(0, 0, 0));
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
             ComponentCalculator calculator = new ComponentCalculator();
@@ -87,7 +118,7 @@ namespace CriminisiAlgorithm
             int rosWidth = int.Parse(textBoxStartWidth.Text);
             int rosHeight = int.Parse(textBoxStartHeight.Text);
             int lambda = int.Parse(textBoxLambda.Text);
-            float threshold = float.Parse(textBoxThreshold.Text); 
+            float threshold = float.Parse(textBoxThreshold.Text);
 
             int blockSize = int.Parse(textBox1.Text);
             int stepSize = int.Parse(textBox2.Text);
@@ -115,7 +146,7 @@ namespace CriminisiAlgorithm
                     imgBlocks.DivideRGBImageIntoBlocks(pictureBox1.Image, blockSize, stepSize);
                     List<IBlock> imageBlocks = imgBlocks.Blocks;
 
-                    Parallel.ForEach(rosBlocks,  item =>
+                    Parallel.ForEach(rosBlocks, item =>
                     {
                         BlockRGB rosBlock = (BlockRGB)item;
                         double maxFuzzy = int.MinValue;
@@ -151,8 +182,8 @@ namespace CriminisiAlgorithm
                                         else diffBluePixels[i, j] = 0;
 
                                         diffPixels[i, j] = (isANDChecked == true)
-                                            ? (byte)(diffRedPixels[i, j] & diffGreenPixels[i, j] & diffBluePixels[i, j])
-                                            : (byte)(diffRedPixels[i, j] | diffGreenPixels[i, j] | diffBluePixels[i, j]);
+                                            ? ComputeAnd(diffRedPixels[i, j], diffGreenPixels[i, j], diffBluePixels[i, j])
+                                            : ComputeOr(diffRedPixels[i, j], diffGreenPixels[i, j], diffBluePixels[i, j]);
                                     }
                                 }
 
@@ -222,7 +253,7 @@ namespace CriminisiAlgorithm
                                     }
                                 }
 
-                                BlockGrayscale differenceBlock = new BlockGrayscale(new Point(rosBlock.X, rosBlock.Y), new Size(blockSize, blockSize), diffPixels);
+                                BlockGrayscale differenceBlock = new BlockGrayscale(new Point(rosBlock.TopLeft.X, rosBlock.TopLeft.Y), new Size(blockSize, blockSize), diffPixels);
                                 differenceBlock.TamperedBlock = rosBlock;
                                 differenceBlock.Source = imageBlock;
 
@@ -234,7 +265,7 @@ namespace CriminisiAlgorithm
                                     {
                                         differenceBlock.MatchingDegree = x;
                                         maxFuzzy = fuzzyValue;
-                                        maxBlock = differenceBlock;                                     
+                                        maxBlock = differenceBlock;
                                     }
                                 }
                             }
@@ -250,43 +281,77 @@ namespace CriminisiAlgorithm
 
             Console.WriteLine("+");
 
-            foreach (IBlock diffValue in diffValues)
+            foreach (IBlock diffValue in diffValues.Where(aw => aw != null))
             {
+                if (diffValue == null)
+                {
+                    continue;
+                }
                 // Define the rectangle
-                int rectX = diffValue.X;
-                int rectY = diffValue.Y;
-                int rectWidth = diffValue.Width; 
-                int rectHeight = diffValue.Height;
+                int rectX = diffValue.TopLeft.X;
+                int rectY = diffValue.TopLeft.Y;
+                int rectWidth = diffValue.Size.Width;
+                int rectHeight = diffValue.Size.Height;
 
                 //Console.WriteLine(String.Format("X: {0}, Y: {1}, Width: {2}, Height: {3}", rectX, rectY, rectWidth, rectHeight));
 
                 // To white color
-                Bgr rectangleColor = new Bgr(255, 255, 255);
-
+                Bgr whiteColor = new Bgr(255, 255, 255);
+                var color = new Bgr(RandomColorGenerator.GetRandomColor());
                 for (int i = rectX; i < rectX + rectWidth; i++)
                 {
                     for (int j = rectY; j < rectY + rectHeight; j++)
                     {
                         //Console.WriteLine(String.Format("i: {0}, j: {1}, limits i: {2}, limits j: {3}", i, j, rectX + rectWidth, rectY + rectHeight));
                         // Set the pixel color
-                        blackImage[i, j] = rectangleColor;
+                        if (rbtRosWithReferenceWithColor.Checked)
+                        {
+                            blackImage[j, i] = color;
+                        }
+                        else
+                        {
+                            blackImage[j, i] = whiteColor;
+                        }
+                        
+                        blackImageToComputeRate[j, i] = whiteColor;
                     }
                 }
 
-                pictureBox2.Image = blackImage.ToBitmap();
-                pictureBox2.SizeMode = PictureBoxSizeMode.Zoom;
-                pictureBox2.Refresh();
+                if (rbtRosWithReferenceWithColor.Checked)
+                {
+                    for (int i = 0; i < rectWidth; i++)
+                    {
+                        for (int j = 0; j < rectHeight; j++)
+                        {
+                            //Console.WriteLine(String.Format("i: {0}, j: {1}, limits i: {2}, limits j: {3}", i, j, rectX + rectWidth, rectY + rectHeight));
+                            // Set the pixel color
+                            blackImage[j + diffValue.Source.TopLeft.Y, i + diffValue.Source.TopLeft.X] = color;
+                        }
+                    }
+                }
             }
+            var mask = new Image<Bgr, byte>(originalMaskFilename);
+            mask.Draw(new Rectangle(startX, startY, rosWidth, rosHeight), new Bgr(Color.WhiteSmoke));
+            pictureBox3.Image = mask.ToBitmap();
+            pictureBox3.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox3.Refresh();
+
+            blackImage.Draw(new Rectangle(startX, startY, rosWidth, rosHeight), new Bgr(Color.WhiteSmoke));
+            pictureBox2.Image = blackImage.ToBitmap();
+            pictureBox2.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox2.Refresh();
+
 
             int TruePositive = 0;
             int TrueNegative = 0;
             int FalsePositive = 0;
             int FalseNegative = 0;
-
-            Bitmap bitmap1 = new Bitmap(blackImage.ToBitmap());
+            blackImage.Save("blackImage.bmp");
+            blackImageToComputeRate.Save("blackImageToComputeRate.bmp");
+            Bitmap bitmap1 = new Bitmap(blackImageToComputeRate.ToBitmap());
             Bitmap bitmap2 = new Bitmap(originalMask);
 
-            if (bitmap1.Width == bitmap2.Width && bitmap1.Height == bitmap2.Height)
+            //if (bitmap1.Width == bitmap2.Width && bitmap1.Height == bitmap2.Height)
             {
                 for (int i = 0; i < bitmap1.Width; i++)
                 {
@@ -320,16 +385,26 @@ namespace CriminisiAlgorithm
                 }
 
                 File.AppendAllText(filename, Environment.NewLine);
+                lblTruePositive.Text = "TP=" + TruePositive.ToString();
+                lblTrueNegative.Text = "TN=" + TrueNegative.ToString();
+                lblFalsePositive.Text = "FP=" + FalsePositive.ToString();
+                lblFalseNegative.Text = "FN=" + FalseNegative.ToString();
 
                 Console.WriteLine("TruePositive = " + TruePositive);
                 Console.WriteLine("TrueNegative = " + TrueNegative);
                 Console.WriteLine("FalsePositive = " + FalsePositive);
                 Console.WriteLine("FalseNegative = " + FalseNegative);
 
-                File.AppendAllText(filename, "TruePositive = " + TruePositive + Environment.NewLine);
-                File.AppendAllText(filename, "TrueNegative = " + TrueNegative + Environment.NewLine);
-                File.AppendAllText(filename, "FalsePositive = " + FalsePositive + Environment.NewLine);
-                File.AppendAllText(filename, "FalseNegative = " + FalseNegative + Environment.NewLine);
+                s.Append(TruePositive + ";");
+                s.Append(TrueNegative + ";");
+                s.Append(FalsePositive + ";");
+                s.Append(FalseNegative + ";");
+                s.Append(blockSize.ToString() + ";");
+                s.Append(stepSize.ToString() + ";");
+                s.Append(threshold.ToString() + ";");
+                s.Append((isRGBChecked ? "RGB" : "Gray") + ";");
+                s.Append(a.ToString() + ";");
+                s.Append(b.ToString() + ";");
             }
 
             stopWatch.Stop();
@@ -338,13 +413,12 @@ namespace CriminisiAlgorithm
             string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
                 ts.Hours, ts.Minutes, ts.Seconds,
                 ts.Milliseconds / 10);
-            File.AppendAllText(filename, "Time elapsed: " + elapsedTime + Environment.NewLine);
-            File.AppendAllText(filename, "Number of best match matrixes: " + diffValues.Count + Environment.NewLine);
-            Console.WriteLine("RunTime " + elapsedTime);
-            
-            MessageBox.Show($"done {elapsedTime} " + diffValues.Count);
+            s.Append(elapsedTime + ";");
+            s.Append(diffValues.Count + ";");
 
-            File.AppendAllText(filename, Environment.NewLine);
+            MessageBox.Show($"done {elapsedTime} " + diffValues.Count);
+            File.AppendAllText(filename, s.ToString());
+
         }
 
         private bool isRGBChecked = false;
@@ -365,7 +439,7 @@ namespace CriminisiAlgorithm
         {
             if (rbtRGB.Checked)
             {
-                isANDChecked = rbtAnd.Checked ;
+                isANDChecked = rbtAnd.Checked;
             }
             else
             {
@@ -398,14 +472,14 @@ namespace CriminisiAlgorithm
 
         private void pictureBox3_Click(object sender, EventArgs e)
         {
-            
+
         }
 
         private void button4_Click(object sender, EventArgs e)
         {
-           
 
-            
+
+
         }
 
         public void textBox9_TextChanged(object sender, EventArgs e)
@@ -415,8 +489,8 @@ namespace CriminisiAlgorithm
 
         public void textBox10_TextChanged(object sender, EventArgs e)
         {
-           // int textBox9Value = int.Parse(textBox9.Text);
-           // int textBox10Value = int.Parse(textBox10.Text);
+            // int textBox9Value = int.Parse(textBox9.Text);
+            // int textBox10Value = int.Parse(textBox10.Text);
         }
 
         private void radioButton2_CheckedChanged(object sender, EventArgs e)
@@ -437,5 +511,4 @@ namespace CriminisiAlgorithm
             }
         }
     }
-    
 }

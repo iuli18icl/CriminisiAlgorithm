@@ -11,11 +11,6 @@ namespace CriminisiAlgorithm
         public Point TopLeft { get; set; }
         public Size Size { get; set; }
 
-        public int X => TopLeft.X;
-        public int Y => TopLeft.Y;
-        public int Width => Size.Width;
-        public int Height => Size.Height;
-
         public byte[,] Pixels { get; set; }
 
         public int MatchingDegree { get; set; }

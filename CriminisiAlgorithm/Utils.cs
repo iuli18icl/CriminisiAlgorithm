@@ -58,7 +58,7 @@ namespace CriminisiAlgorithm
         // functie pt a transforma din <byte[,]> in <rectangle>
         public static Rectangle BlockToRectangle(IBlock block)
         {
-            return new Rectangle(block.X, block.Y, block.Width, block.Height);
+            return new Rectangle(block.TopLeft.X, block.TopLeft.Y, block.Size.Height, block.Size.Width);
         }
 
         // functii pt overlapping

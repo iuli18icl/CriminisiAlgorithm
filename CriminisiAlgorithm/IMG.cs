@@ -32,7 +32,7 @@ namespace CriminisiAlgorithm
 
             for (int i = 0; i <= width - BlockSize; i += Step)
             {
-                for (int j = 0; j <= height  - BlockSize; j += Step)
+                for (int j = 0; j <= height - BlockSize; j += Step)
                 {
                     byte[,] blockR = new byte[BlockSize, BlockSize];
                     byte[,] blockG = new byte[BlockSize, BlockSize];

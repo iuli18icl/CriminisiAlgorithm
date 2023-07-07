@@ -11,11 +11,6 @@ namespace CriminisiAlgorithm
         Point TopLeft { get; set; }
         Size Size { get; set; }
 
-        int X { get; }
-        int Y { get; }
-        int Width { get; }
-        int Height { get; }
-
         IBlock Source { get; set; }
         IBlock TamperedBlock { get; set; }
     }
