@@ -25,14 +25,14 @@ namespace CriminisiAlgorithm
         {
             byte[,,] imageStructure = Utils.ImageToByteArray(image);
 
-            int width = imageStructure.GetLength(0);    //row
-            int height = imageStructure.GetLength(1);   //columns
+            int width = imageStructure.GetLength(0);    //columns
+            int height = imageStructure.GetLength(1);   //row
 
             List<IBlock> blocks = new List<IBlock>();
 
-            for (int i = 0; i <= height - BlockSize; i += Step)
+            for (int i = 0; i <= width - BlockSize; i += Step)
             {
-                for (int j = 0; j <= width  - BlockSize; j += Step)
+                for (int j = 0; j <= height  - BlockSize; j += Step)
                 {
                     byte[,] blockR = new byte[BlockSize, BlockSize];
                     byte[,] blockG = new byte[BlockSize, BlockSize];
@@ -48,7 +48,7 @@ namespace CriminisiAlgorithm
                         }
                     }
 
-                    BlockRGB blockStructure = new BlockRGB(new Point(i, j), new Size(height, width), blockR, blockG, blockB);
+                    BlockRGB blockStructure = new BlockRGB(new Point(i, j), new Size(BlockSize, BlockSize), blockR, blockG, blockB);
 
 
                     blocks.Add(blockStructure);
@@ -68,9 +68,9 @@ namespace CriminisiAlgorithm
 
             List<IBlock> blocks = new List<IBlock>();
 
-            for (int i = 0; i <= height - blockSize; i += step)
+            for (int i = 0; i <= width - blockSize; i += step)
             {
-                for (int j = 0; j <= width - blockSize; j += step)
+                for (int j = 0; j <= height - blockSize; j += step)
                 {
                     byte[,] blockPixels = new byte[blockSize, blockSize];
 

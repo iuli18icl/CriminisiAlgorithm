@@ -10,7 +10,7 @@ namespace CriminisiAlgorithm
     {
         public int Width { get; set; }
         public int Height { get; set; }
-        public Size(int Height, int Width) 
+        public Size(int Width, int Height) 
         {
             this.Width = Width;
             this.Height = Height;

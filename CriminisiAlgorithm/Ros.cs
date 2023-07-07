@@ -27,12 +27,11 @@ namespace CriminisiAlgorithm
             int height = imageStructure.GetLength(1);
 
             // ne asiguram ca regiune data se gaseste in limitele imaginii
-            Size.Height = Math.Min(Size.Height, height - TopLeft.X);
-            Size.Width = Math.Min(Size.Width, width - TopLeft.Y);
+            Size.Width = Math.Min(Size.Width, width - TopLeft.X);
+            Size.Height = Math.Min(Size.Height, height - TopLeft.Y);
 
-
-            int endX = TopLeft.X + Size.Height;
-            int endY = TopLeft.Y + Size.Width;
+            int endX = TopLeft.X + Size.Width;
+            int endY = TopLeft.Y + Size.Height;
 
             for (int i = TopLeft.X; i <= endX - blockSize; i += stepSize)
             {
@@ -72,12 +71,11 @@ namespace CriminisiAlgorithm
             int height = imageStructure.GetLength(1);
 
             // Make sure the given region is within the image boundaries
-            Size.Height = Math.Min(Size.Height, height - TopLeft.X);
-            Size.Width = Math.Min(Size.Width, width - TopLeft.Y);
+            Size.Width = Math.Min(Size.Width, width - TopLeft.X);
+            Size.Height = Math.Min(Size.Height, height - TopLeft.Y);
 
-
-            int endX = TopLeft.X + Size.Height;
-            int endY = TopLeft.Y + Size.Width;
+            int endX = TopLeft.X + Size.Width;
+            int endY = TopLeft.Y + Size.Height;
 
             for (int i = TopLeft.X; i <= endX - blockSize; i += stepSize)
             {
